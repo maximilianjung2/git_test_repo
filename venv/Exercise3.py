@@ -17,7 +17,8 @@ for element in list:
         result_list_negative.append(element)
 print('teilbar durch: '+str(divisor))
 print(result_list_positive)
-print('nicht teilbar durch: '+str(divisor))
+###bugfix
+print('folgende liste ist nicht teilbar durch: '+str(divisor))
 print(result_list_negative)
 
 
