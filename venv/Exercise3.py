@@ -19,4 +19,4 @@ print('teilbar durch: '+str(divisor))
 print(result_list_positive)
 print('nicht teilbar durch: '+str(divisor))
 print(result_list_negative)
-print('Test')
+
