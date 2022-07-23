@@ -16,4 +16,4 @@ Um branch zu wechseln git checkout <br>
 in github dann pull request stellen, mergen, unnötigen branch  löschen<br>
 local pull ziehen <br> 
 Heute ist Juli. Wir probieren den ganzen Spass jetzt nochmal.
-
+jetzt im master branch
