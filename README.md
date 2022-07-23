@@ -14,4 +14,6 @@ Um einen neuen Branch zu erstellen benutze git checkout -b "neuer branch" <br>
 Um branch zu wechseln git checkout <br>
 Änderungen in neuem Branch vornehmen, Änderungen commiten und pushen <br>
 in github dann pull request stellen, mergen, unnötigen branch  löschen<br>
-local pull ziehen
+local pull ziehen <br> 
+Heute ist Juli. Wir probieren den ganzen Spass jetzt nochmal.
+
