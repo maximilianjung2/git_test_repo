@@ -24,9 +24,11 @@
     }
 
     .container img {
-      width: 150px;
-      border-radius: 50%;
-      margin-bottom: 20px;
+        width: 100%;              /* oder z. B. 300px für feste Breite */
+        max-width: 500px;         /* Begrenzung, damit es nicht zu groß wird */
+        height: auto;             /* behält das Seitenverhältnis bei */
+        margin-bottom: 20px;
+        border-radius: 0;         /* ✅ keine Rundung */
     }
 
     .container h1 {
@@ -58,8 +60,6 @@
 <body>
   <div class="container">
     <img src="/Images/Flyer.JPG" alt="Flyer">
-   
-   
     <a class="button" href="https://www.instagram.com/spvgghainstadt_lauftreff/" target="_blank">Lauftreff auf Instagramm</a>
     <a class="button" href="https://spvgg1879.de" target="_blank">Spvgg. Hainstadt</a>
 </div>
