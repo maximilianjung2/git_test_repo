@@ -1,13 +1,67 @@
-<!doctype html>
-<html>
-    <img src="/Images/Flyer.JPG" style="display: block; margin: auto;" width="30%" height="30%"/>
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Zentriertes Layout</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f0f2f5;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
 
+    .container {
+      text-align: center;
+      padding: 20px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .container img {
+      width: 150px;
+      border-radius: 50%;
+      margin-bottom: 20px;
+    }
+
+    .container h1 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    .container p {
+      font-size: 1.1rem;
+      color: #555;
+    }
+
+    .button {
+      margin-top: 20px;
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #e1306c;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+
+    .button:hover {
+      background-color: #c7255a;
+    }
+  </style>
+</head>
 <body>
-    <br><br><br><br><br><br><br>
-
-    <center>
-        <a href="https://www.instagram.com/spvgghainstadt_lauftreff/">Lauftreff auf Instagram</a> <br>
-        <a href="https://spvgg1879.de">Spvgg. Hainstadt</a> <br>
-    </center>
+  <div class="container">
+    <img src="/Images/Flyer.JPG" alt="Flyer">
+   
+   
+    <a class="button" href="https://www.instagram.com/spvgghainstadt_lauftreff/" target="_blank">Lauftreff auf Instagramm</a>
+    <a class="button" href="https://spvgg1879.de" target="_blank">Spvgg. Hainstadt</a>
+</div>
 </body>
 </html>
