@@ -26,19 +26,20 @@
     }
 
     .gallery {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 15px;
-      margin-top: 20px;
-    }
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
 
-    .gallery img {
-      width: 100%;
-      height: auto;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-      transition: transform 0.3s ease;
-    }
+.gallery img {
+  width: 150px;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
 
     .gallery img:hover {
       transform: scale(1.05);
@@ -78,6 +79,9 @@
 
     <div class="gallery">
       <img src="/Images/Flyer Frühling.png" alt="Flyer">
+      <img src="/Images/Lauftreff_shirt_max.jpeg" alt="Wasserlauf Seligenstadt 2025">
+      <img src="/Images/Winter.jpeg" alt="Winter 2024">
+      
 
       <!-- Du kannst beliebig viele Bilder hinzufügen -->
     </div>
