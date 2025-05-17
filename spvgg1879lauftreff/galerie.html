@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Zentriertes Layout</title>
+  <title>Fotogalerie</title>
   <style>
     body {
       margin: 0;
@@ -21,29 +21,42 @@
       background: #fff;
       border-radius: 12px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      max-width: 1000px;
+      width: 95%;
     }
 
-    .container img {
-        width: 70%;              /* oder z. B. 300px für feste Breite */
-        max-width: 500px;         /* Begrenzung, damit es nicht zu groß wird */
-        height: auto;             /* behält das Seitenverhältnis bei */
-        margin-bottom: 20px;
-        border-radius: 0;         /* ✅ keine Rundung */
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
     }
 
-    .container h1 {
+    .gallery img {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+
+    .gallery img:hover {
+      transform: scale(1.05);
+    }
+
+    h1 {
       font-size: 2rem;
       margin-bottom: 10px;
     }
 
-    .container p {
+    p {
       font-size: 1.1rem;
       color: #555;
     }
 
     .button {
       margin-top: 20px;
-      display: center;
+      display: inline-block;
       padding: 10px 20px;
       background-color: #191fcb;
       color: white;
@@ -51,10 +64,7 @@
       border-radius: 8px;
       font-weight: bold;
       font-size: 0.7rem;
-      max-width: 200px;
-      width: 80%;
     }
-    
 
     .button:hover {
       background-color: #e60707;
@@ -63,12 +73,16 @@
 </head>
 <body>
   <div class="container">
-    <img src="/Images/Flyer.JPG" alt="Flyer">
-    <br><br>
-    <a class="button" href="https://www.instagram.com/spvgghainstadt_lauftreff/" target="_blank">Instagram</a>
-    <a class="button" href="https://spvgg1879.de" target="_blank">Spvgg. Hainstadt</a>
-    <a class="button" href="mailto:lauftreff@spvgg1879.de" target="_blank">Fragen?</a>
-    <a class="button" href="galerie.html" target="_blank">Fotos</a>
-</div>
+    <h1>Unsere Fotogalerie</h1>
+    <p>Ein paar Eindrücke aus dem Lauftreff:</p>
+
+    <div class="gallery">
+      <img src="/Images/Flyer Frühling.png" alt="Flyer">
+
+      <!-- Du kannst beliebig viele Bilder hinzufügen -->
+    </div>
+
+    <a class="button" href="index.html">Zurück</a>
+  </div>
 </body>
 </html>
