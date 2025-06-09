@@ -64,10 +64,13 @@ echo "✅ Aktivitäten empfangen:\n";
 
 // Alle Distanzen summieren
 $kmGesamt = 0;
+$count = 0
 foreach ($activities as $activity) {
+    echo  $count
     if ($activity['type'] === 'Run') {
         $kmGesamt += $activity['distance']; // Meter
     }
+    $count=$count+1
 }
 
 $kmGerundet = round($kmGesamt / 1000, 2); // in km
