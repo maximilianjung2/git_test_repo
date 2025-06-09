@@ -1,5 +1,5 @@
 <?php
-$code = $_GET['c530924f5b06b275af1297e58d7192de9f9c7414'];
+$code = $_GET['code'];
 $client_id = '163827';
 $client_secret = '21c8af73247d8876684acf4e36ec1fa1d38c9a67';
 
