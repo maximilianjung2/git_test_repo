@@ -13,7 +13,7 @@ $tokens = json_decode(file_get_contents($tokenFile), true);
 echo "🔑 Tokens geladen:\n";
 print_r($tokens);
 
-// Wenn Access Token abgelaufen → erneuern
+// Access Token ggf. erneuern
 if (time() >= $tokens['expires_at']) {
     echo "🔄 Access Token abgelaufen, hole neuen...\n";
 
@@ -33,7 +33,6 @@ if (time() >= $tokens['expires_at']) {
     echo "✅ Neue Tokens erhalten:\n";
     print_r($newTokens);
 
-    // Tokens aktualisieren
     file_put_contents($tokenFile, json_encode($newTokens));
     $tokens = $newTokens;
 } else {
@@ -42,9 +41,35 @@ if (time() >= $tokens['expires_at']) {
 
 // Aktivitäten abrufen
 echo "📡 Hole Aktivitäten von Strava API...\n";
+
 $ch = curl_init("https://www.strava.com/api/v3/athlete/activities?per_page=50");
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
     'Authorization: Bearer ' . $tokens['access_token']
 ]);
-$response = c
+
+$response = curl_exec($ch);
+if ($response === false) {
+    die("❌ Fehler bei der Anfrage: " . curl_error($ch) . "\n");
+}
+curl_close($ch);
+
+$activities = json_decode($response, true);
+if (!is_array($activities)) {
+    die("❌ Ungültige Antwort von der Strava API:\n$response\n");
+}
+
+echo "✅ Aktivitäten empfangen:\n";
+// print_r($activities); // optional, für große Ausgabe
+
+// Alle Distanzen summieren
+$kmGesamt = 0;
+foreach ($activities as $activity) {
+    if ($activity['type'] === 'Run') {
+        $kmGesamt += $activity['distance']; // Meter
+    }
+}
+
+$kmGerundet = round($kmGesamt / 1000, 2); // in km
+echo "🏃‍♂️ Gesamt-Kilometer (letzte 50 Läufe): $kmGerundet km\n";
+?>
