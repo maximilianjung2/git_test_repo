@@ -19,3 +19,4 @@ $response = file_get_contents("https://www.strava.com/oauth/token", false, strea
 $data = json_decode($response, true);
 file_put_contents('strava_tokens.json', json_encode($data));
 echo "Tokens gespeichert.";
+?>
