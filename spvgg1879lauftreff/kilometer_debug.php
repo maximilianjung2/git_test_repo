@@ -66,10 +66,11 @@ echo "✅ Aktivitäten empfangen:\n";
 $kmGesamt = 0;
 $count = 0;
 foreach ($activities as $activity) {
-    echo  $count;
+    
     if ($activity['type'] === 'Run') {
         
         $kmGesamt += $activity['distance']; // Meter
+    echo $activity['name'];
     }
     $count=$count+1;
 }
