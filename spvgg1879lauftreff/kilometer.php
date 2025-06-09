@@ -1,5 +1,5 @@
 <?php
-$client_id = 163827;
+$client_id = '163827';
 $client_secret = '21c8af73247d8876684acf4e36ec1fa1d38c9a67';
 $tokenFile = __DIR__ . '/strava_tokens.json';
 
