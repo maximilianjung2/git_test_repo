@@ -64,18 +64,16 @@ echo "✅ Aktivitäten empfangen:\n";
 
 // Alle Distanzen summieren
 $kmGesamt = 0;
-foreach ($all_activities as $activity) {
-    if (
-        $activity['type'] === 'Run' &&
-        strpos($activity['name'], 'Spvgg. Hainstadt') !== false
-    ) {
-        $titel = $activity['name'];
-        $distanz_km = round($activity['distance'] / 1000, 2);
-        $datum = date("d.m.Y", strtotime($activity['start_date_local']));
-        echo "📅 $datum | 🏁 $titel | 📏 $distanz_km km\n";
+$count = 0;
+foreach ($activities as $activity) {
+    echo  $count;
+    if ($activity['type'] === 'Run') {
+        
+        $kmGesamt += $activity['distance']; // Meter
     }
+    $count=$count+1;
 }
 
 $kmGerundet = round($kmGesamt / 1000, 2); // in km
-echo "🏃‍♂️ Gesamt-Kilometer (letzte 50 Läufe): $kmGerundet km\n";
+echo "🏃‍♂️ Gesamt-Kilometer (letzte 100 Läufe): $kmGerundet km\n";
 ?>
