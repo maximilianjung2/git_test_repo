@@ -42,7 +42,7 @@ if (time() >= $tokens['expires_at']) {
 // Aktivitäten abrufen
 echo "📡 Hole Aktivitäten von Strava API...\n";
 
-$ch = curl_init("https://www.strava.com/api/v3/athlete/activities?per_page=50");
+$ch = curl_init("https://www.strava.com/api/v3/athlete/activities?per_page=100");
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
     'Authorization: Bearer ' . $tokens['access_token']
@@ -64,13 +64,16 @@ echo "✅ Aktivitäten empfangen:\n";
 
 // Alle Distanzen summieren
 $kmGesamt = 0;
-$count = 0;
-foreach ($activities as $activity) {
-    echo  $count;
-    if ($activity['type'] === 'Run') {
-        $kmGesamt += $activity['distance']; // Meter
+foreach ($all_activities as $activity) {
+    if (
+        $activity['type'] === 'Run' &&
+        strpos($activity['name'], 'Spvgg. Hainstadt') !== false
+    ) {
+        $titel = $activity['name'];
+        $distanz_km = round($activity['distance'] / 1000, 2);
+        $datum = date("d.m.Y", strtotime($activity['start_date_local']));
+        echo "📅 $datum | 🏁 $titel | 📏 $distanz_km km\n";
     }
-    $count=$count+1;
 }
 
 $kmGerundet = round($kmGesamt / 1000, 2); // in km
