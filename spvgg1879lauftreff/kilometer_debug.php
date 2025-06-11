@@ -2,6 +2,8 @@
 $client_id = '163827';
 $client_secret = '21c8af73247d8876684acf4e36ec1fa1d38c9a67';
 $tokenFile = __DIR__ . '/strava_tokens.json';
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
 echo "<pre>";
 
@@ -59,18 +61,70 @@ if (!is_array($activities)) {
     die("❌ Ungültige Antwort von der Strava API:\n$response\n");
 }
 
+
 echo "✅ Aktivitäten empfangen:\n";
 // print_r($activities); // optional, für große Ausgabe
+
+echo "verbindung zu db";
+try {
+    $db = new PDO('mysql:host=database-5018019376.webspace-host.com;dbname=dbs14323265', 'dbu302398', 'lauftreffhomepage');
+    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("❌ Datenbankfehler: " . $e->getMessage());
+}
+
+$insert = $db->prepare("
+    INSERT INTO strava_activities (
+        id, name, type, distance, moving_time, elapsed_time,
+        start_date, start_date_local, timezone, average_speed,
+        max_speed, total_elevation_gain, kudos_count, athlete_id
+    ) VALUES (
+        :id, :name, :type, :distance, :moving_time, :elapsed_time,
+        :start_date, :start_date_local, :timezone, :average_speed,
+        :max_speed, :total_elevation_gain, :kudos_count, :athlete_id
+    )
+    ON DUPLICATE KEY UPDATE
+        name = VALUES(name),
+        distance = VALUES(distance),
+        moving_time = VALUES(moving_time),
+        elapsed_time = VALUES(elapsed_time),
+        start_date = VALUES(start_date),
+        start_date_local = VALUES(start_date_local),
+        timezone = VALUES(timezone),
+        average_speed = VALUES(average_speed),
+        max_speed = VALUES(max_speed),
+        total_elevation_gain = VALUES(total_elevation_gain),
+        kudos_count = VALUES(kudos_count)
+");
 
 // Alle Distanzen summieren
 $kmGesamt = 0;
 $count = 0;
 foreach ($activities as $activity) {
-    
-    if ($activity['type'] === 'Run') {
+    if ($activity['type'] === 'Run' 
+    && strpos($activity['name'], 'Spvgg. Hainstadt') !== false) 
+    {
         
+        $insert->execute([
+            ':id' => $activity['id'],
+            ':name' => $activity['name'],
+            ':type' => $activity['type'],
+            ':distance' => $activity['distance'],
+            ':moving_time' => $activity['moving_time'],
+            ':elapsed_time' => $activity['elapsed_time'],
+            ':start_date' => $activity['start_date'],
+            ':start_date_local' => $activity['start_date_local'],
+            ':timezone' => $activity['timezone'],
+            ':average_speed' => $activity['average_speed'],
+            ':max_speed' => $activity['max_speed'],
+            ':total_elevation_gain' => $activity['total_elevation_gain'],
+            ':kudos_count' => $activity['kudos_count'],
+            ':athlete_id' => $activity['athlete']['id'] ?? 0
+        ]);
+
         $kmGesamt += $activity['distance']; // Meter
-    echo $activity['name'];
+        echo $activity['name'];
+        echo '<br>';
     }
     $count=$count+1;
 }
