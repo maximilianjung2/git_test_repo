@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Lauf-Kilometer pro Monat</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            padding: 40px;
+            text-align: center;
+        }
+        .chart-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        h2 {
+            margin-bottom: 30px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="chart-container">
+        <h2>Lauf-Kilometer pro Monat (Spvgg. Hainstadt)</h2>
+        <canvas id="laufChart" width="600" height="300"></canvas>
+    </div>
+
+    <script>
+        fetch('chart_data.php')
+            .then(response => response.json())
+            .then(json => {
+                const ctx = document.getElementById('laufChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: json.labels,
+                        datasets: [{
+                            label: 'Kilometer',
+                            data: json.data,
+                            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1,
+                            borderRadius: 5
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Kilometer'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Monat'
+                                }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Fehler beim Laden der Daten:', error));
+    </script>
+</body>
+</html>
