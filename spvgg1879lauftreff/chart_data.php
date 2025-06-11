@@ -20,7 +20,7 @@ try {
 
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         // Name + Datum als Label
-        $labels[] = $row['datum'] . ' – ' . $row['name'];
+        $labels[] = $row['datum'];
         $data[] = $row['kilometer'];
     }
 
