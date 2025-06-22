@@ -2,22 +2,22 @@
 $client_id = '163827';
 $client_secret = '21c8af73247d8876684acf4e36ec1fa1d38c9a67';
 $tokenFile = __DIR__ . '/strava_tokens.json';
+
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-echo "<pre>";
+echo "<pre>🔄 Starte Strava-Sync...\n";
 
 // Tokens laden
 if (!file_exists($tokenFile)) {
     die("❌ Token-Datei nicht gefunden.\n");
 }
 $tokens = json_decode(file_get_contents($tokenFile), true);
-echo "🔑 Tokens geladen:\n";
-print_r($tokens);
+echo "🔑 Tokens geladen.\n";
 
-// Access Token ggf. erneuern
+// Token ggf. erneuern
 if (time() >= $tokens['expires_at']) {
-    echo "🔄 Access Token abgelaufen, hole neuen...\n";
+    echo "🔄 Token abgelaufen, hole neuen...\n";
 
     $refresh_url = "https://www.strava.com/oauth/token?" . http_build_query([
         'client_id' => $client_id,
@@ -28,51 +28,63 @@ if (time() >= $tokens['expires_at']) {
 
     $newResponse = file_get_contents($refresh_url);
     if ($newResponse === false) {
-        die("❌ Fehler beim Abrufen des neuen Tokens.\n");
+        die("❌ Fehler beim Token-Refresh.\n");
     }
 
     $newTokens = json_decode($newResponse, true);
-    echo "✅ Neue Tokens erhalten:\n";
-    print_r($newTokens);
-
     file_put_contents($tokenFile, json_encode($newTokens));
     $tokens = $newTokens;
+    echo "✅ Token aktualisiert.\n";
 } else {
-    echo "✅ Access Token ist noch gültig.\n";
+    echo "✅ Access Token ist gültig.\n";
 }
 
-// Aktivitäten abrufen
-echo "📡 Hole Aktivitäten von Strava API...\n";
+// Aktivitäten der letzten 365 Tage laden (alle Seiten)
+echo "📡 Lade Aktivitäten der letzten 365 Tage...\n";
+$yearAgo = strtotime('-365 days');
+$page = 1;
+$allActivities = [];
 
-$ch = curl_init("https://www.strava.com/api/v3/athlete/activities?per_page=100");
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    'Authorization: Bearer ' . $tokens['access_token']
-]);
+do {
+    $url = "https://www.strava.com/api/v3/athlete/activities?" . http_build_query([
+        'after' => $yearAgo,
+        'per_page' => 200,
+        'page' => $page
+    ]);
 
-$response = curl_exec($ch);
-if ($response === false) {
-    die("❌ Fehler bei der Anfrage: " . curl_error($ch) . "\n");
-}
-curl_close($ch);
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Authorization: Bearer ' . $tokens['access_token']
+    ]);
 
-$activities = json_decode($response, true);
-if (!is_array($activities)) {
-    die("❌ Ungültige Antwort von der Strava API:\n$response\n");
-}
+    $response = curl_exec($ch);
+    if ($response === false) {
+        die("❌ Fehler bei API-Anfrage (Seite $page): " . curl_error($ch) . "\n");
+    }
+    curl_close($ch);
 
+    $activities = json_decode($response, true);
+    if (!is_array($activities)) {
+        die("❌ Ungültige Antwort (Seite $page):\n$response\n");
+    }
 
-echo "✅ Aktivitäten empfangen:\n";
-// print_r($activities); // optional, für große Ausgabe
+    $allActivities = array_merge($allActivities, $activities);
+    echo "📄 Seite $page: " . count($activities) . " Aktivitäten geladen.\n";
+    $page++;
+} while (count($activities) === 200);
 
-echo "verbindung zu db";
+// Verbindung zur Datenbank
+echo "🛠️ Verbinde mit Datenbank...\n";
 try {
     $db = new PDO('mysql:host=database-5018019376.webspace-host.com;dbname=dbs14323265', 'dbu302398', 'lauftreffhomepage');
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    echo "✅ Verbindung erfolgreich.\n";
 } catch (PDOException $e) {
-    die("❌ Datenbankfehler: " . $e->getMessage());
+    die("❌ DB-Fehler: " . $e->getMessage());
 }
 
+// DB-Statement vorbereiten
 $insert = $db->prepare("
     INSERT INTO strava_activities (
         id, name, type, distance, moving_time, elapsed_time,
@@ -97,14 +109,13 @@ $insert = $db->prepare("
         kudos_count = VALUES(kudos_count)
 ");
 
-// Alle Distanzen summieren
+// Aktivitäten filtern & speichern
+echo "💾 Verarbeite Aktivitäten mit \"Spvgg. Hainstadt\"...\n";
 $kmGesamt = 0;
 $count = 0;
-foreach ($activities as $activity) {
-    if ($activity['type'] === 'Run' 
-    && strpos($activity['name'], 'Spvgg. Hainstadt') !== false) 
-    {
-        
+
+foreach ($allActivities as $activity) {
+    if ($activity['type'] === 'Run' && strpos($activity['name'], 'Spvgg. Hainstadt') !== false) {
         $insert->execute([
             ':id' => $activity['id'],
             ':name' => $activity['name'],
@@ -122,13 +133,13 @@ foreach ($activities as $activity) {
             ':athlete_id' => $activity['athlete']['id'] ?? 0
         ]);
 
-        $kmGesamt += $activity['distance']; // Meter
-        echo $activity['name'];
-        echo '<br>';
+        echo "✔️ " . $activity['name'] . " gespeichert.\n";
+        $kmGesamt += $activity['distance'];
+        $count++;
     }
-    $count=$count+1;
 }
 
-$kmGerundet = round($kmGesamt / 1000, 2); // in km
-echo "🏃‍♂️ Gesamt-Kilometer (letzte 100 Läufe): $kmGerundet km\n";
-?>
+$kmGerundet = round($kmGesamt / 1000, 2);
+echo "\n🏁 Fertig: $count Aktivitäten gespeichert.\n";
+echo "📏 Gesamt-Kilometer: $kmGerundet km\n";
+echo "</pre>";
