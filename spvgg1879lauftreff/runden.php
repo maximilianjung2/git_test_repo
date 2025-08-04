@@ -144,8 +144,8 @@ $gesamtKm     = 0.0;
         <table>
             <thead>
                 <tr>
-                    <th>Name</th>
                     <th>Vorname</th>
+                    <th>Name</th>
                     <th>Runden</th>
                     <th>km</th>
                     <th>Aktion</th>
@@ -158,8 +158,9 @@ $gesamtKm     = 0.0;
                     $gesamtKm += $row['km'];
                 ?>
                     <tr>
-                        <td><?= htmlspecialchars($row['Name']) ?></td>
                         <td><?= htmlspecialchars($row['Vorname']) ?></td>
+                        <td><?= htmlspecialchars($row['Name']) ?></td>
+                        
                         <td><?= $row['runden'] ?></td>
                         <td><?= number_format($row['km'], 2, ',', '.') ?></td>
                         <td>
