@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Kursübersicht — Sportvereinigung</title>
+
+<style>
+  /* ----------------------
+     Farben / Designsystem
+     (Modern / Light, Vereinsakzente)
+     ---------------------- */
+  :root{
+    --blue-main: #0b4ea6;     /* Vereinsblau (etwas heller für light style) */
+    --blue-dark: #003a78;     /* dunkleres Blau für Headline */
+    --red-main:  #e3322c;     /* Vereinsrot */
+    --bg:        #fbfcfe;     /* sehr helles weiß-blau */
+    --card:      #ffffff;
+    --muted:     #6f7780;
+    --border:    #e6ebf1;
+    --radius:    10px;
+    --shadow:    0 6px 18px rgba(15,30,50,0.06);
+    font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+  }
+
+  /* ----------------------
+     Grundlayout
+     ---------------------- */
+  html,body{height:100%;margin:0;background:var(--bg);color:#172033}
+  .wrap{max-width:1180px;margin:28px auto;padding:18px}
+  .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
+  h1{margin:0 0 6px 0; color:var(--blue-dark); font-weight:700; font-size:20px; letter-spacing:0.5px}
+  .meta{color:var(--muted); font-size:13px; margin-bottom:12px}
+
+  /* ----------------------
+     Controls (Search + Filters)
+     ---------------------- */
+  .controls{display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-bottom:14px}
+  .field{display:flex;flex-direction:column;min-width:160px}
+  label.small{font-size:12px;color:var(--muted);margin-bottom:6px}
+  input[type="search"]{
+    padding:10px 12px;border-radius:8px;border:1px solid var(--border);
+    background:linear-gradient(180deg,#fff,#fbfdff);
+    outline:none; font-size:14px;
+  }
+  select{
+    padding:9px 10px;border-radius:8px;border:1px solid var(--border);background:#fff;
+    font-size:14px;
+  }
+  .actions{margin-left:auto;display:flex;gap:8px}
+  button.btn{
+    padding:10px 14px;border-radius:10px;border:0;cursor:pointer;font-weight:600;
+    box-shadow:none;
+  }
+  button.primary{background:var(--red-main);color:#fff}
+  button.ghost{background:transparent;border:1px solid var(--blue-main);color:var(--blue-main)}
+
+  /* ----------------------
+     Table styling
+     ---------------------- */
+  table{width:100%;border-collapse:collapse;font-size:14px;background:transparent}
+  thead th{
+    text-align:left;padding:12px 14px;border-bottom:2px solid var(--border);
+    color:var(--blue-dark);font-weight:700;font-size:13px;
+    background:linear-gradient(180deg,#ffffff,#fbfdff);
+  }
+  tbody td{padding:12px 14px;border-bottom:1px solid #f2f5f8;vertical-align:top}
+  tbody tr:hover{background:linear-gradient(90deg, rgba(11,78,166,0.03), rgba(227,50,44,0.01));}
+  .small{font-size:13px;color:var(--muted)}
+  a.link{color:var(--blue-main); text-decoration:none; font-weight:600}
+  .badge{display:inline-block;padding:4px 10px;border-radius:999px;background:#f6f9ff;color:var(--blue-main);font-size:12px;margin-right:6px;border:1px solid var(--border)}
+
+  /* alternating rows subtle */
+  tbody tr:nth-child(odd){background:transparent}
+  tbody tr:nth-child(even){background:linear-gradient(180deg,#ffffff,#fbfcff)}
+
+  /* ----------------------
+     Responsive: card per row
+     ---------------------- */
+  @media (max-width:920px){
+    .controls{align-items:stretch}
+    thead{display:none}
+    table, tbody, tr, td{display:block;width:100%}
+    tr{margin-bottom:12px;border-radius:10px;padding:10px;background:var(--card);box-shadow:var(--shadow)}
+    td{padding:8px;border-bottom:0}
+    td:before{font-weight:700;display:inline-block;width:120px;margin-right:8px;color:var(--muted);font-size:13px}
+    td:nth-of-type(1):before{content:"Übungsleiter";}
+    td:nth-of-type(2):before{content:"Kontakt";}
+    td:nth-of-type(3):before{content:"Kurs";}
+    td:nth-of-type(4):before{content:"Kurzbeschreibung";}
+    td:nth-of-type(5):before{content:"Wann";}
+    td:nth-of-type(6):before{content:"Wo";}
+    td:nth-of-type(7):before{content:"Link";}
+  }
+
+  /* small tweaks */
+  .no-results{padding:20px;text-align:center;color:var(--muted)}
+  footer.hint{margin-top:12px;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div style="display:flex;gap:12px;align-items:center;margin-bottom:10px">
+      <img src="" alt="" style="width:56px;height:56px;border-radius:6px;object-fit:contain;display:none">
+      <div>
+        <h1>Kursübersicht — Sportvereinigung</h1>
+        <div class="meta">Interaktive Übersicht — Suche &amp; Filter. Datenquelle: <code>courses.json</code></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="controls" role="region" aria-label="Filter und Suche">
+        <div class="field" style="flex:1;min-width:200px">
+          <label class="small" for="q">Suche (global)</label>
+          <input id="q" type="search" placeholder="Suche nach Kurs, Übungsleiter, Ort, Zeit..." aria-label="Suche">
+        </div>
+
+        <div class="field">
+          <label class="small" for="filter-instructor">Übungsleiter</label>
+          <select id="filter-instructor"><option value="">Alle</option></select>
+        </div>
+
+        <div class="field">
+          <label class="small" for="filter-weekday">Wochentag</label>
+          <select id="filter-weekday"><option value="">Alle</option></select>
+        </div>
+
+        <div class="field">
+          <label class="small" for="filter-wo">Ort</label>
+          <select id="filter-wo"><option value="">Alle</option></select>
+        </div>
+
+        <div class="field">
+          <label class="small" for="filter-kurs">Kursname</label>
+          <select id="filter-kurs"><option value="">Alle</option></select>
+        </div>
+
+        <div class="field">
+          <label class="small" for="filter-category">Kategorie</label>
+          <select id="filter-category"><option value="">Alle</option></select>
+        </div>
+
+        <div class="actions">
+          <button id="reset" class="btn ghost" title="Filter zurücksetzen">Zurücksetzen</button>
+          <button id="exportCsv" class="btn primary" title="Als CSV herunterladen">CSV Export</button>
+        </div>
+      </div>
+
+      <div id="table-wrap" style="margin-top:12px">
+        <table id="kurs-table" aria-live="polite">
+          <thead>
+            <tr>
+              <th>Übungsleiter</th>
+              <th>Kontakt</th>
+              <th>Kurs</th>
+              <th>Kurzbeschreibung</th>
+              <th>Wann</th>
+              <th>Wo</th>
+              <th>Weiterführender Link</th>
+            </tr>
+          </thead>
+          <tbody><!-- generiert --></tbody>
+        </table>
+
+        <div id="no-results" class="no-results" style="display:none">Keine Einträge gefunden.</div>
+      </div>
+    </div>
+
+    <div class="hint footer" style="text-align:left">Tipp: Bearbeite <code>courses.json</code> zum Pflegen der Daten. Achte auf gültiges JSON.</div>
+  </div>
+
+<script>
+(async function(){
+  // lade daten
+  const resp = await fetch('courses.json');
+  const data = await resp.json();
+
+  // Elemente
+  const $tbody = document.querySelector('#kurs-table tbody');
+  const $q = document.getElementById('q');
+  const $filterInstructor = document.getElementById('filter-instructor');
+  const $filterWeekday = document.getElementById('filter-weekday');
+  const $filterWo = document.getElementById('filter-wo');
+  const $filterKurs = document.getElementById('filter-kurs');
+  const $filterCategory = document.getElementById('filter-category');
+  const $reset = document.getElementById('reset');
+  const $noResults = document.getElementById('no-results');
+  const $export = document.getElementById('exportCsv');
+
+  // Hilfsfunktionen
+  const uniqSorted = arr => Array.from(new Set(arr.filter(Boolean).map(x => x.toString().trim()))).sort((a,b)=> a.localeCompare(b,'de'));
+
+  // fülle filter
+  const instructors = uniqSorted(data.map(d=>d.instructor));
+  const weekdays   = uniqSorted(data.map(d=>d.weekday));
+  const wos        = uniqSorted(data.map(d=>d.wo));
+  const kurse      = uniqSorted(data.map(d=>d.kurs));
+  const cats       = uniqSorted(data.map(d=>d.category));
+
+  function fillSelect(s, list){
+    for(const v of list){
+      const opt = document.createElement('option');
+      opt.value = v;
+      opt.textContent = v;
+      s.appendChild(opt);
+    }
+  }
+  fillSelect($filterInstructor, instructors);
+  fillSelect($filterWeekday, weekdays);
+  fillSelect($filterWo, wos);
+  fillSelect($filterKurs, kurse);
+  fillSelect($filterCategory, cats);
+
+  // render
+  function renderRows(rows){
+    $tbody.innerHTML = '';
+    if(!rows.length){
+      $noResults.style.display = 'block';
+      document.getElementById('kurs-table').style.display = 'none';
+      return;
+    } else {
+      $noResults.style.display = 'none';
+      document.getElementById('kurs-table').style.display = '';
+    }
+
+    for(const r of rows){
+      const tr = document.createElement('tr');
+      const linkCell = r.link ? `<a class="link" href="${r.link}" target="_blank" rel="noopener noreferrer">${r.link}</a>` : '';
+      tr.innerHTML = `
+        <td>${escapeHtml(r.instructor || '')}</td>
+        <td class="small">${escapeHtml(r.kontakt || '')}</td>
+        <td><strong>${escapeHtml(r.kurs || '')}</strong> <div class="small" style="margin-top:6px"><span class="badge">${escapeHtml(r.category || '')}</span></div></td>
+        <td>${escapeHtml(r.kurzbeschreibung || '')}</td>
+        <td class="small">${escapeHtml(r.wann || '')}</td>
+        <td class="small">${escapeHtml(r.wo || '')}</td>
+        <td>${linkCell}</td>
+      `;
+      $tbody.appendChild(tr);
+    }
+  }
+
+  // sichere Ausgabe
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(m){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"})[m]; });
+  }
+
+  // filter & suche
+  function applyFilters(){
+    const q = $q.value.trim().toLowerCase();
+    const fi = $filterInstructor.value;
+    const fw = $filterWeekday.value;
+    const fwo = $filterWo.value;
+    const fk = $filterKurs.value;
+    const fc = $filterCategory.value;
+
+    const filtered = data.filter(d => {
+      const hay = [d.instructor, d.kurs, d.kurzbeschreibung, d.wann, d.wo, d.link, d.category].filter(Boolean).join(' ').toLowerCase();
+      if(q && !hay.includes(q)) return false;
+      if(fi && d.instructor !== fi) return false;
+      if(fw && d.weekday !== fw) return false;
+      if(fwo && d.wo !== fwo) return false;
+      if(fk && d.kurs !== fk) return false;
+      if(fc && d.category !== fc) return false;
+      return true;
+    });
+
+    renderRows(filtered);
+    return filtered;
+  }
+
+  // Events
+  [$q, $filterInstructor, $filterWeekday, $filterWo, $filterKurs, $filterCategory].forEach(el=>{
+    el.addEventListener('input', applyFilters);
+    el.addEventListener('change', applyFilters);
+  });
+
+  $reset.addEventListener('click', ()=>{
+    $q.value=''; $filterInstructor.value=''; $filterWeekday.value=''; $filterWo.value=''; $filterKurs.value=''; $filterCategory.value='';
+    applyFilters();
+  });
+
+  // CSV Export (sichtbare, gefilterte Zeilen)
+  $export.addEventListener('click', ()=>{
+    const rows = applyFilters();
+    if(!rows.length){ alert('Keine Daten zum exportieren.'); return; }
+
+    const cols = ['instructor','kontakt','kurs','kurzbeschreibung','wann','wo','link','weekday','category'];
+    const csv = [cols.join(',')].concat(rows.map(r => cols.map(c => `"${(r[c]||'').toString().replace(/"/g,'""')}"`).join(','))).join('\n');
+    const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'kurse_export.csv'; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 5000);
+  });
+
+  // initial render
+  renderRows(data);
+
+})();
+</script>
+</body>
+</html>
