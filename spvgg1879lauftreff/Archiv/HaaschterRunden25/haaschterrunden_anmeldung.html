@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Anmeldung Haaschter Runden</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f0f2f5;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      background: #fff;
+      padding: 30px 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      color: #111;
+    }
+
+    h1 {
+      font-size: 2rem;
+      color: #191fcb;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      text-align: left;
+      margin: 15px 0 5px 0;
+      font-weight: bold;
+      color: #191fcb;
+    }
+
+    input[type="text"], select {
+      width: 100%;
+      padding: 10px;
+      font-size: 1rem;
+      border: 2px solid #191fcb;
+      border-radius: 8px;
+      box-sizing: border-box;
+      transition: border-color 0.3s ease;
+    }
+
+    input[type="text"]:focus, select:focus {
+      border-color: #e60707;
+      outline: none;
+    }
+
+    .button {
+      margin-top: 25px;
+      background-color: #191fcb;
+      color: white;
+      padding: 12px 25px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      width: 100%;
+      transition: background-color 0.3s ease;
+    }
+
+    .button:hover {
+      background-color: #e60707;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Anmeldung Haaschter Runden</h1>
+    <form action="anmeldung.php" method="post">
+      <label for="vorname">Vorname</label>
+      <input type="text" id="vorname" name="vorname" required />
+
+      <label for="name">Nachname</label>
+      <input type="text" id="name" name="name" required />
+
+      <label for="disziplin">Laufen oder Walken</label>
+      <select id="disziplin" name="disziplin" required>
+        <option value="" disabled selected>Bitte wählen</option>
+        <option value="laufen">Laufen</option>
+        <option value="walken">Walken</option>
+      </select>
+
+      
+        <!-- deine Input-Felder -->
+        <button type="submit" class="button">Anmelden</button>
+    </form>
+  </div>
+</body>
+</html>
