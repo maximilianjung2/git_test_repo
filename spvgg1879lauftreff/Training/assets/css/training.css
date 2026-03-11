@@ -1,0 +1,174 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f0f2f5;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    text-align: center;
+    padding: 24px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    width: min(92%, 700px);
+}
+
+.button,
+button {
+    margin-top: 12px;
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #191fcb;
+    color: white;
+    text-decoration: none;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.button:hover,
+button:hover {
+    background-color: #e60707;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    max-width: 400px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.wide {
+    width: min(96%, 1100px);
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    margin-top: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+th,
+td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+    vertical-align: top;
+}
+
+th {
+    background-color: #f7f7f7;
+}
+
+small {
+    color: #666;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 16px;
+    margin: 24px 0;
+}
+
+.stat-card {
+    background: #f8f9fb;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+.stat-card h3 {
+    margin-top: 0;
+    font-size: 1rem;
+    color: #333;
+}
+
+.stat-card p {
+    margin-bottom: 0;
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #191fcb;
+}
+
+.inline-form {
+    margin: 0;
+}
+
+.inline-form select {
+    max-width: 160px;
+}
+
+.inline-form input[type="range"] {
+    width: 120px;
+    vertical-align: middle;
+}
+
+.inline-form span {
+    display: inline-block;
+    min-width: 20px;
+    margin-left: 6px;
+    font-weight: bold;
+    color: #191fcb;
+}
+
+.inline-form {
+    margin: 0 0 6px 0;
+}
+
+.actions-cell a,
+.action-link-button {
+    display: inline;
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    color: #0000ee;
+    text-decoration: underline;
+    font: inherit;
+    font-weight: normal;
+    cursor: pointer;
+}
+
+.actions-cell a:hover,
+.action-link-button:hover {
+    color: #e60707;
+    background: none;
+}
+
+select[form] {
+    max-width: 160px;
+}
+
+input[type="range"][form] {
+    width: 120px;
+    vertical-align: middle;
+}
+
+.chart-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    margin: 20px 0 32px 0;
+}
+
+.chart-card canvas {
+    width: 100% !important;
+    max-height: 380px;
+}
