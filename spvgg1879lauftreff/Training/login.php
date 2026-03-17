@@ -6,21 +6,26 @@ require __DIR__ . '/includes/auth.php';
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = trim($_POST['username'] ?? '');
+    $login = trim($_POST['login'] ?? '');
     $password = $_POST['password'] ?? '';
 
-    $stmt = $pdo->prepare("SELECT id, password_hash FROM users WHERE username = :username LIMIT 1");
-    $stmt->execute(['username' => $username]);
+    $stmt = $pdo->prepare("
+        SELECT id, username, email, password_hash, is_active
+        FROM users
+        WHERE username = :login OR email = :login
+        LIMIT 1
+    ");
+    $stmt->execute(['login' => $login]);
     $user = $stmt->fetch();
 
-    if ($user && password_verify($password, $user['password_hash'])) {
+    if ($user && (int)$user['is_active'] === 1 && password_verify($password, $user['password_hash'])) {
         $_SESSION['user_id'] = (int)$user['id'];
-        $_SESSION['username'] = $username;
+        $_SESSION['username'] = $user['username'];
 
         header('Location: /training/dashboard.php');
         exit;
     } else {
-        $error = 'Benutzername oder Passwort ist falsch.';
+        $error = 'Benutzername/E-Mail oder Passwort ist falsch.';
     }
 }
 ?>
@@ -42,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <form method="post">
             <p>
-                <input type="text" name="username" placeholder="Benutzername" required>
+                <input type="text" name="login" placeholder="Benutzername oder E-Mail" required>
             </p>
             <p>
                 <input type="password" name="password" placeholder="Passwort" required>
