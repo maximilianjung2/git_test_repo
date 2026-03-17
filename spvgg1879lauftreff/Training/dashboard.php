@@ -65,7 +65,7 @@ $recentEntries = $recentStmt->fetchAll();
 
 /*
 |--------------------------------------------------------------------------
-| Basisdaten für Charts: Tageswerte der letzten 120 Tage
+| Basisdaten für kombinierte Grafik: letzte 180 Tage
 |--------------------------------------------------------------------------
 */
 $dailyStmt = $pdo->prepare("
@@ -82,18 +82,13 @@ $dailyStmt = $pdo->prepare("
     FROM training_entries
     WHERE user_id = :user_id
       AND is_hidden = 0
-      AND activity_date >= DATE_SUB(CURDATE(), INTERVAL 119 DAY)
+      AND activity_date >= DATE_SUB(CURDATE(), INTERVAL 179 DAY)
     GROUP BY activity_date
     ORDER BY activity_date ASC
 ");
 $dailyStmt->execute(['user_id' => $userId]);
 $dailyRows = $dailyStmt->fetchAll();
 
-/*
-|--------------------------------------------------------------------------
-| Lückenlose Zeitreihe erzeugen
-|--------------------------------------------------------------------------
-*/
 $dailyMap = [];
 foreach ($dailyRows as $row) {
     $dailyMap[$row['activity_date']] = [
@@ -106,17 +101,15 @@ $labels = [];
 $load7 = [];
 $load30 = [];
 $fitness7 = [];
-$fitness30 = [];
 
 $start = new DateTime();
-$start->modify('-119 days');
+$start->modify('-179 days');
 
 $loadWindow7 = [];
 $loadWindow30 = [];
 $fitnessWindow7 = [];
-$fitnessWindow30 = [];
 
-for ($i = 0; $i < 120; $i++) {
+for ($i = 0; $i < 180; $i++) {
     $date = clone $start;
     $date->modify("+{$i} days");
     $dateKey = $date->format('Y-m-d');
@@ -136,28 +129,17 @@ for ($i = 0; $i < 120; $i++) {
         array_shift($loadWindow30);
     }
 
-    if ($dayFitness !== null) {
-        $fitnessWindow7[] = $dayFitness;
-        $fitnessWindow30[] = $dayFitness;
-    }
-
+    $fitnessWindow7[] = $dayFitness;
     if (count($fitnessWindow7) > 7) {
         array_shift($fitnessWindow7);
     }
 
-    if (count($fitnessWindow30) > 30) {
-        array_shift($fitnessWindow30);
-    }
+    $fitnessValues7 = array_values(array_filter($fitnessWindow7, static fn($v) => $v !== null));
 
     $load7[] = round(array_sum($loadWindow7), 1);
     $load30[] = round(array_sum($loadWindow30), 1);
-
-    $fitness7[] = count($fitnessWindow7) > 0
-        ? round(array_sum($fitnessWindow7) / count($fitnessWindow7), 2)
-        : null;
-
-    $fitness30[] = count($fitnessWindow30) > 0
-        ? round(array_sum($fitnessWindow30) / count($fitnessWindow30), 2)
+    $fitness7[] = count($fitnessValues7) > 0
+        ? round(array_sum($fitnessValues7) / count($fitnessValues7), 2)
         : null;
 }
 
@@ -166,7 +148,6 @@ $chartData = [
     'load7' => $load7,
     'load30' => $load30,
     'fitness7' => $fitness7,
-    'fitness30' => $fitness30,
 ];
 ?>
 <!DOCTYPE html>
@@ -217,14 +198,16 @@ $chartData = [
             <a class="button" href="/training/logout.php">Logout</a>
         </p>
 
-        <h2>Belastungsverlauf</h2>
-        <div class="chart-card">
-            <canvas id="loadChart"></canvas>
+        <h2>Formkurve</h2>
+        <div class="chart-toolbar">
+            <button type="button" class="chart-range-btn active" data-range="7">7 Tage</button>
+            <button type="button" class="chart-range-btn" data-range="30">30 Tage</button>
+            <button type="button" class="chart-range-btn" data-range="90">3 Monate</button>
+            <button type="button" class="chart-range-btn" data-range="180">6 Monate</button>
         </div>
 
-        <h2>Fitnessgefühl-Verlauf</h2>
         <div class="chart-card">
-            <canvas id="fitnessChart"></canvas>
+            <canvas id="formChart"></canvas>
         </div>
 
         <h2>Letzte Einheiten</h2>
@@ -264,68 +247,92 @@ $chartData = [
     <script>
         const chartData = <?= json_encode($chartData, JSON_UNESCAPED_UNICODE) ?>;
 
-        new Chart(document.getElementById('loadChart'), {
-            type: 'line',
-            data: {
-                labels: chartData.labels,
-                datasets: [
-                    {
-                        label: 'Belastung 7 Tage',
-                        data: chartData.load7,
-                        tension: 0.25
-                    },
-                    {
-                        label: 'Belastung 30 Tage',
-                        data: chartData.load30,
-                        tension: 0.25
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                interaction: {
-                    mode: 'index',
-                    intersect: false
+        function sliceLast(arr, range) {
+            return arr.slice(-range);
+        }
+
+        const ctx = document.getElementById('formChart');
+        let formChart;
+
+        function buildChart(range) {
+            const labels = sliceLast(chartData.labels, range);
+            const load7 = sliceLast(chartData.load7, range);
+            const load30 = sliceLast(chartData.load30, range);
+            const fitness7 = sliceLast(chartData.fitness7, range);
+
+            if (formChart) {
+                formChart.destroy();
+            }
+
+            formChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Belastung 7 Tage',
+                            data: load7,
+                            yAxisID: 'yLoad',
+                            tension: 0.25
+                        },
+                        {
+                            label: 'Belastung 30 Tage',
+                            data: load30,
+                            yAxisID: 'yLoad',
+                            tension: 0.25
+                        },
+                        {
+                            label: 'Fitness 7 Tage',
+                            data: fitness7,
+                            yAxisID: 'yFitness',
+                            tension: 0.25
+                        }
+                    ]
                 },
-                scales: {
-                    y: {
-                        beginAtZero: true
+                options: {
+                    responsive: true,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    maintainAspectRatio: false,
+                    scales: {
+                        yLoad: {
+                            type: 'linear',
+                            position: 'left',
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Belastung'
+                            }
+                        },
+                        yFitness: {
+                            type: 'linear',
+                            position: 'right',
+                            min: 0,
+                            max: 10,
+                            grid: {
+                                drawOnChartArea: false
+                            },
+                            title: {
+                                display: true,
+                                text: 'Fitness'
+                            }
+                        }
                     }
                 }
-            }
+            });
+        }
+
+        document.querySelectorAll('.chart-range-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.chart-range-btn').forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                buildChart(parseInt(button.dataset.range, 10));
+            });
         });
 
-        new Chart(document.getElementById('fitnessChart'), {
-            type: 'line',
-            data: {
-                labels: chartData.labels,
-                datasets: [
-                    {
-                        label: 'Fitnessgefühl 7 Tage',
-                        data: chartData.fitness7,
-                        tension: 0.25
-                    },
-                    {
-                        label: 'Fitnessgefühl 30 Tage',
-                        data: chartData.fitness30,
-                        tension: 0.25
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                interaction: {
-                    mode: 'index',
-                    intersect: false
-                },
-                scales: {
-                    y: {
-                        min: 0,
-                        max: 10
-                    }
-                }
-            }
-        });
+        buildChart(7);
     </script>
 </body>
 </html>

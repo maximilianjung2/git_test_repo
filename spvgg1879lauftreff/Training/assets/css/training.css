@@ -172,3 +172,40 @@ input[type="range"][form] {
     width: 100% !important;
     max-height: 380px;
 }
+
+.chart-toolbar {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 12px 0 18px 0;
+}
+
+.chart-range-btn {
+    display: inline-block;
+    padding: 10px 16px;
+    background-color: #191fcb;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.chart-range-btn:hover,
+.chart-range-btn.active {
+    background-color: #e60707;
+}
+
+.chart-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    margin: 20px 0 32px 0;
+    height: 420px;
+}
+
+.chart-card canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
