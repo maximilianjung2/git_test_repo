@@ -195,6 +195,8 @@ $chartData = [
             <a class="button" href="/training/entry_form.php">Neue Einheit eintragen</a>
             <a class="button" href="/training/entries.php">Meine Einheiten</a>
             <a class="button" href="/training/strava_import.php">Strava-Import</a>
+            <a class="button" href="/training/wiki.php">Wiki / Hilfe</a>
+
             <?php if (isAdmin()): ?>
                 <a class="button" href="/training/admin_users.php">Admin Nutzer</a>
             <?php endif; ?>
