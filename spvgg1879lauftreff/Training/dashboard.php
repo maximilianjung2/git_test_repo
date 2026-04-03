@@ -162,7 +162,7 @@ $chartData = [
 <body>
     <div class="container wide">
         <h1>Willkommen im Trainingsbereich</h1>
-        <p>Hallo <?= htmlspecialchars($_SESSION['username']) ?>!</p>
+        <p>Hallo <?= htmlspecialchars(currentUsername() ?? '') ?>!</p>
 
         <div class="stats-grid">
             <div class="stat-card">
@@ -195,7 +195,9 @@ $chartData = [
             <a class="button" href="/training/entry_form.php">Neue Einheit eintragen</a>
             <a class="button" href="/training/entries.php">Meine Einheiten</a>
             <a class="button" href="/training/strava_import.php">Strava-Import</a>
-            <a class="button" href="/training/wiki.php">Wiki / Hilfe</a>
+            <?php if (isAdmin()): ?>
+                <a class="button" href="/training/admin_users.php">Admin Nutzer</a>
+            <?php endif; ?>
             <a class="button" href="/training/logout.php">Logout</a>
         </p>
 
