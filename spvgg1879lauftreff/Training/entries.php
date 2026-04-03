@@ -3,29 +3,9 @@
 require __DIR__ . '/includes/auth.php';
 requireLogin();
 require __DIR__ . '/includes/db.php';
+require __DIR__ . '/includes/entry_repository.php';
 
-$stmt = $pdo->prepare("
-    SELECT
-        id,
-        activity_date,
-        title,
-        sport_type,
-        training_type,
-        distance_km,
-        duration_min,
-        rpe,
-        fitness_feeling,
-        notes,
-        source
-    FROM training_entries
-    WHERE user_id = :user_id
-      AND is_hidden = 0
-    ORDER BY activity_date DESC, id DESC
-");
-$stmt->execute([
-    'user_id' => currentUserId()
-]);
-$entries = $stmt->fetchAll();
+$entries = getVisibleEntriesForUser($pdo, currentUserId());
 
 $trainingTypes = [
     'Locker',
@@ -77,6 +57,7 @@ $trainingTypes = [
             <a class="button" href="/training/entry_form.php">Neue Einheit</a>
             <a class="button" href="/training/dashboard.php">Dashboard</a>
             <a class="button" href="/training/strava_import.php">Strava-Import</a>
+            <a class="button" href="/training/export_entries.php">CSV-Export</a>
         </p>
 
         <?php if (!$entries): ?>
