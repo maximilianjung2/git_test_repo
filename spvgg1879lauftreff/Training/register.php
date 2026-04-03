@@ -72,12 +72,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     username,
                     email,
                     password_hash,
-                    is_active
+                    is_active,
+                    role
                 ) VALUES (
                     :username,
                     :email,
                     :password_hash,
-                    1
+                    1,
+                    'user'
                 )
             ");
             $insertUser->execute([

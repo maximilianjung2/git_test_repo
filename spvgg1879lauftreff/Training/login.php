@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'] ?? '';
 
     $stmt = $pdo->prepare("
-        SELECT id, username, email, password_hash, is_active
+        SELECT id, username, email, password_hash, is_active, COALESCE(role, 'user') AS role
         FROM users
         WHERE username = :login OR email = :login
         LIMIT 1
@@ -21,6 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($user && (int)$user['is_active'] === 1 && password_verify($password, $user['password_hash'])) {
         $_SESSION['user_id'] = (int)$user['id'];
         $_SESSION['username'] = $user['username'];
+        $_SESSION['role'] = $user['role'] ?: 'user';
 
         header('Location: /training/dashboard.php');
         exit;

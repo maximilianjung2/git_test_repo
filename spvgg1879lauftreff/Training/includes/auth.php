@@ -23,3 +23,29 @@ function currentUserId(): ?int
 {
     return $_SESSION['user_id'] ?? null;
 }
+
+function currentUsername(): ?string
+{
+    return $_SESSION['username'] ?? null;
+}
+
+function currentUserRole(): string
+{
+    return $_SESSION['role'] ?? 'user';
+}
+
+function isAdmin(): bool
+{
+    return currentUserRole() === 'admin';
+}
+
+function requireAdmin(): void
+{
+    requireLogin();
+
+    if (!isAdmin()) {
+        http_response_code(403);
+        echo 'Zugriff verweigert.';
+        exit;
+    }
+}
