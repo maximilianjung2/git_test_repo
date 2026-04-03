@@ -249,6 +249,29 @@
                 den der neue Nutzer verwenden kann, um seinen Account selbst anzulegen.
             </p>
 
+            <h3>Admin-Funktionen</h3>
+            <p>
+                Das Projekt unterstützt aktuell eine einfache Rollenlogik mit den Rollen <code>admin</code> und <code>user</code>.
+                Die Rollen werden direkt in der Datenbank verwaltet und nicht über das Frontend geändert.
+            </p>
+
+            <p>
+                Admin-Rechte bilden die technische Grundlage dafür, bestimmte Bereiche oder Funktionen nur für berechtigte Nutzer
+                freizugeben. Aktuell ist diese Logik vor allem als Basis für spätere Verwaltungsfunktionen gedacht.
+            </p>
+
+            <ul>
+                <li><strong>Rollenmodell:</strong> Nutzer haben die Rolle <code>admin</code> oder <code>user</code>.</li>
+                <li><strong>Rechtevergabe:</strong> Die Rolle wird direkt in der Datenbank gesetzt oder geändert.</li>
+                <li><strong>Standard für neue Nutzer:</strong> Neue Registrierungen erhalten standardmäßig die Rolle <code>user</code>.</li>
+                <li><strong>Admin-Schutz im Code:</strong> Über die Auth-Logik können Bereiche gezielt nur für Admins freigegeben werden.</li>
+            </ul>
+
+            <p>
+                Ein größeres Admin-Frontend mit Nutzerübersicht oder Invite-Verwaltung ist als möglicher nächster Schritt vorgesehen,
+                aber noch nicht vollständig Bestandteil des aktuellen produktiven Funktionsumfangs.
+            </p>
+
             <div class="wiki-note">
                 Auf dieser Seite sollten keine Passwörter, API-Keys, Secrets oder andere sensible Betriebsdaten dokumentiert werden.
             </div>
@@ -319,7 +342,6 @@
             <ul>
                 <li>Filter für <code>Meine Einheiten</code></li>
                 <li>bessere Visualisierung von Belastung und Fitness</li>
-                <li>einfacher Admin-Bereich für Nutzerverwaltung</li>
                 <li>weitere Aufräumarbeiten in der Codebasis</li>
                 <li>schrittweise Ausbau der Projektdokumentation</li>
             </ul>
