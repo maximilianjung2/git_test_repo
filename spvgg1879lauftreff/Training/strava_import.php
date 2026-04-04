@@ -95,8 +95,26 @@ if ($connection) {
         <?php endif; ?>
 
         <?php if (!$connection): ?>
+            <div style="max-width: 640px; margin: 0 auto 24px; text-align: left;">
             <p>Dein Strava-Konto ist noch nicht verbunden.</p>
-            <p><a class="button" href="/training/strava_connect.php">Mit Strava verbinden</a></p>
+                    <p>
+                        Um Aktivitäten aus Strava zu importieren, musst du dein Konto einmal mit Strava verbinden.
+                        Die Freigabe erfolgt direkt bei Strava.
+                    </p>
+
+                    <p style="margin-top: 16px;">
+                        <a href="/training/strava_connect.php" aria-label="Connect with Strava">
+                            <img
+                                src="/training/assets/img/strava/btn_strava_connect_with_orange_x2.png"
+                                alt="Connect with Strava"
+                                style="height: 48px; width: auto; display: inline-block;"
+                            >
+                        </a>
+
+                <p style="font-size: 0.95rem; color: #555;">
+                    Nach der Freigabe bei Strava kannst du deine letzten Läufe hier zum Import auswählen.
+                </p>
+            </div>
             <p><a class="button" href="/training/dashboard.php">Zurück zum Dashboard</a></p>
         <?php else: ?>
             <p>Wähle die Läufe aus, die du importieren möchtest.</p>
