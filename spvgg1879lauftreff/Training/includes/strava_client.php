@@ -11,19 +11,22 @@ function getStravaConfig(): array
 
 function getStravaConnection(PDO $pdo, int $userId): ?array
 {
-    $stmt = $pdo->prepare("
-        SELECT *
-        FROM strava_connections
-        WHERE user_id = :user_id
-        LIMIT 1
-    ");
+    $stmt = $pdo->prepare("\n        SELECT *\n        FROM strava_connections\n        WHERE user_id = :user_id\n        LIMIT 1\n    ");
     $stmt->execute([
-        'user_id' => $userId
+        'user_id' => $userId,
     ]);
 
     $connection = $stmt->fetch();
 
     return $connection ?: null;
+}
+
+function deleteStravaConnection(PDO $pdo, int $userId): void
+{
+    $stmt = $pdo->prepare("\n        DELETE FROM strava_connections\n        WHERE user_id = :user_id\n    ");
+    $stmt->execute([
+        'user_id' => $userId,
+    ]);
 }
 
 function saveStravaConnection(PDO $pdo, int $userId, array $tokenData): void
@@ -46,27 +49,7 @@ function saveStravaConnection(PDO $pdo, int $userId, array $tokenData): void
         throw new RuntimeException('Unvollständige Strava-Token-Daten.');
     }
 
-    $stmt = $pdo->prepare("
-        INSERT INTO strava_connections (
-            user_id,
-            strava_athlete_id,
-            access_token,
-            refresh_token,
-            expires_at
-        ) VALUES (
-            :user_id,
-            :strava_athlete_id,
-            :access_token,
-            :refresh_token,
-            :expires_at
-        )
-        ON DUPLICATE KEY UPDATE
-            strava_athlete_id = VALUES(strava_athlete_id),
-            access_token = VALUES(access_token),
-            refresh_token = VALUES(refresh_token),
-            expires_at = VALUES(expires_at),
-            updated_at = CURRENT_TIMESTAMP
-    ");
+    $stmt = $pdo->prepare("\n        INSERT INTO strava_connections (\n            user_id,\n            strava_athlete_id,\n            access_token,\n            refresh_token,\n            expires_at\n        ) VALUES (\n            :user_id,\n            :strava_athlete_id,\n            :access_token,\n            :refresh_token,\n            :expires_at\n        )\n        ON DUPLICATE KEY UPDATE\n            strava_athlete_id = VALUES(strava_athlete_id),\n            access_token = VALUES(access_token),\n            refresh_token = VALUES(refresh_token),\n            expires_at = VALUES(expires_at),\n            updated_at = CURRENT_TIMESTAMP\n    ");
 
     $stmt->execute([
         'user_id' => $userId,
@@ -121,6 +104,10 @@ function refreshStravaTokenIfNeeded(PDO $pdo, int $userId): ?array
         empty($data['refresh_token']) ||
         empty($data['expires_at'])
     ) {
+        if (in_array($httpCode, [400, 401], true)) {
+            deleteStravaConnection($pdo, $userId);
+        }
+
         throw new RuntimeException('Ungültige Antwort beim Strava-Token-Refresh: ' . $response);
     }
 
@@ -129,7 +116,7 @@ function refreshStravaTokenIfNeeded(PDO $pdo, int $userId): ?array
     return getStravaConnection($pdo, $userId);
 }
 
-function stravaApiGet(string $endpoint, string $accessToken, array $query = []): array
+function stravaApiGet(string $endpoint, string $accessToken, array $query = [], ?int &$httpCode = null): array
 {
     $url = 'https://www.strava.com/api/v3' . $endpoint;
 
@@ -171,10 +158,20 @@ function getRecentStravaRuns(PDO $pdo, int $userId, int $limit = 30): array
         return [];
     }
 
-    $activities = stravaApiGet('/athlete/activities', $connection['access_token'], [
-        'per_page' => $limit,
-        'page' => 1,
-    ]);
+    $httpCode = null;
+
+    try {
+        $activities = stravaApiGet('/athlete/activities', $connection['access_token'], [
+            'per_page' => $limit,
+            'page' => 1,
+        ], $httpCode);
+    } catch (RuntimeException $e) {
+        if ($httpCode === 401) {
+            deleteStravaConnection($pdo, $userId);
+        }
+
+        throw $e;
+    }
 
     $runs = [];
 
@@ -206,15 +203,9 @@ function getRecentStravaRuns(PDO $pdo, int $userId, int $limit = 30): array
 
 function getImportedStravaIds(PDO $pdo, int $userId): array
 {
-    $stmt = $pdo->prepare("
-        SELECT source_activity_id
-        FROM training_entries
-        WHERE user_id = :user_id
-          AND source = 'strava'
-          AND source_activity_id IS NOT NULL
-    ");
+    $stmt = $pdo->prepare("\n        SELECT source_activity_id\n        FROM training_entries\n        WHERE user_id = :user_id\n          AND source = 'strava'\n          AND source_activity_id IS NOT NULL\n    ");
     $stmt->execute([
-        'user_id' => $userId
+        'user_id' => $userId,
     ]);
 
     $rows = $stmt->fetchAll();

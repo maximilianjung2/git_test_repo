@@ -7,75 +7,100 @@ require __DIR__ . '/includes/strava_client.php';
 
 $userId = currentUserId();
 $connection = getStravaConnection($pdo, $userId);
+$stravaError = null;
+$runs = [];
+$importedIds = [];
+
+/*
+ * Passe diesen Pfad an, falls dein heruntergeladenes offizielles
+ * Strava-Button-Asset einen anderen Dateinamen hat.
+ */
+$stravaConnectAssetPath = '/training/assets/img/strava/btn_strava_connect_with_orange_x2.png';
+
+function renderStravaConnectCta(string $assetPath): void
+{
+    ?>
+    <p>
+        Um Aktivitäten aus Strava zu importieren, musst du dein Konto einmal mit Strava verbinden.
+        Die Freigabe erfolgt direkt bei Strava.
+    </p>
+    <p style="margin-top: 16px;">
+        <a href="/training/strava_connect.php" aria-label="Connect with Strava">
+            <img
+                src="<?= htmlspecialchars($assetPath, ENT_QUOTES, 'UTF-8') ?>"
+                alt="Connect with Strava"
+                style="height: 48px; width: auto; display: inline-block;"
+            >
+        </a>
+    </p>
+    <?php
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $selected = $_POST['activity_ids'] ?? [];
 
     if ($connection && is_array($selected) && count($selected) > 0) {
-        $runs = getRecentStravaRuns($pdo, $userId, 50);
-        $runsById = [];
-
-        foreach ($runs as $run) {
-            $runsById[(string)$run['id']] = $run;
+        try {
+            $runs = getRecentStravaRuns($pdo, $userId, 50);
+            $importedIds = getImportedStravaIds($pdo, $userId);
+            $connection = getStravaConnection($pdo, $userId);
+        } catch (RuntimeException $e) {
+            $connection = getStravaConnection($pdo, $userId);
+            $stravaError = 'Die Strava-Verbindung ist nicht mehr gültig. Bitte verbinde dein Konto erneut.';
+            $runs = [];
+            $importedIds = [];
         }
 
-        $insert = $pdo->prepare("
-            INSERT INTO training_entries (
-                user_id,
-                source,
-                source_activity_id,
-                activity_date,
-                title,
-                sport_type,
-                distance_km,
-                duration_min
-            ) VALUES (
-                :user_id,
-                'strava',
-                :source_activity_id,
-                :activity_date,
-                :title,
-                :sport_type,
-                :distance_km,
-                :duration_min
-            )
-        ");
+        if (!$stravaError) {
+            $runsById = [];
 
-        foreach ($selected as $activityId) {
-            $activityId = (string)$activityId;
-
-            if (!isset($runsById[$activityId])) {
-                continue;
+            foreach ($runs as $run) {
+                $runsById[(string)$run['id']] = $run;
             }
 
-            $run = $runsById[$activityId];
+            $insert = $pdo->prepare("\n                INSERT INTO training_entries (\n                    user_id,\n                    source,\n                    source_activity_id,\n                    activity_date,\n                    title,\n                    sport_type,\n                    distance_km,\n                    duration_min\n                ) VALUES (\n                    :user_id,\n                    'strava',\n                    :source_activity_id,\n                    :activity_date,\n                    :title,\n                    :sport_type,\n                    :distance_km,\n                    :duration_min\n                )\n            ");
 
-            try {
-                $insert->execute([
-                    'user_id' => $userId,
-                    'source_activity_id' => $run['id'],
-                    'activity_date' => $run['activity_date'],
-                    'title' => $run['name'],
-                    'sport_type' => $run['sport_type'],
-                    'distance_km' => $run['distance_km'],
-                    'duration_min' => $run['duration_min'],
-                ]);
-            } catch (PDOException $e) {
-                // Doppelte Imports still ignorieren
+            foreach ($selected as $activityId) {
+                $activityId = (string)$activityId;
+
+                if (!isset($runsById[$activityId])) {
+                    continue;
+                }
+
+                $run = $runsById[$activityId];
+
+                try {
+                    $insert->execute([
+                        'user_id' => $userId,
+                        'source_activity_id' => $run['id'],
+                        'activity_date' => $run['activity_date'],
+                        'title' => $run['name'],
+                        'sport_type' => $run['sport_type'],
+                        'distance_km' => $run['distance_km'],
+                        'duration_min' => $run['duration_min'],
+                    ]);
+                } catch (PDOException $e) {
+                    // Doppelte Imports still ignorieren
+                }
             }
+
+            header('Location: /training/entries.php?imported=1');
+            exit;
         }
-
-        header('Location: /training/entries.php?imported=1');
-        exit;
     }
 }
 
-$runs = [];
-$importedIds = [];
-
-if ($connection) {
-    $runs = getRecentStravaRuns($pdo, $userId, 30);
-    $importedIds = getImportedStravaIds($pdo, $userId);
+if ($connection && !$stravaError) {
+    try {
+        $runs = getRecentStravaRuns($pdo, $userId, 30);
+        $importedIds = getImportedStravaIds($pdo, $userId);
+        $connection = getStravaConnection($pdo, $userId);
+    } catch (RuntimeException $e) {
+        $connection = getStravaConnection($pdo, $userId);
+        $stravaError = 'Die Strava-Verbindung ist nicht mehr gültig. Bitte verbinde dein Konto erneut.';
+        $runs = [];
+        $importedIds = [];
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -94,28 +119,18 @@ if ($connection) {
             <p style="color: green;">Strava wurde erfolgreich verbunden.</p>
         <?php endif; ?>
 
-        <?php if (!$connection): ?>
-            <div style="max-width: 640px; margin: 0 auto 24px; text-align: left;">
-            <p>Dein Strava-Konto ist noch nicht verbunden.</p>
-                    <p>
-                        Um Aktivitäten aus Strava zu importieren, musst du dein Konto einmal mit Strava verbinden.
-                        Die Freigabe erfolgt direkt bei Strava.
-                    </p>
-
-                    <p style="margin-top: 16px;">
-                        <a href="/training/strava_connect.php" aria-label="Connect with Strava">
-                            <img
-                                src="/training/assets/img/strava/btn_strava_connect_with_orange_x2.png"
-                                alt="Connect with Strava"
-                                style="height: 48px; width: auto; display: inline-block;"
-                            >
-                        </a>
-
-                <p style="font-size: 0.95rem; color: #555;">
-                    Nach der Freigabe bei Strava kannst du deine letzten Läufe hier zum Import auswählen.
-                </p>
-            </div>
+        <?php if ($stravaError): ?>
+            <p style="color: #b00020;">
+                <?= htmlspecialchars($stravaError) ?>
+            </p>
+            <?php renderStravaConnectCta($stravaConnectAssetPath); ?>
             <p><a class="button" href="/training/dashboard.php">Zurück zum Dashboard</a></p>
+
+        <?php elseif (!$connection): ?>
+            <p>Dein Strava-Konto ist noch nicht verbunden.</p>
+            <?php renderStravaConnectCta($stravaConnectAssetPath); ?>
+            <p><a class="button" href="/training/dashboard.php">Zurück zum Dashboard</a></p>
+
         <?php else: ?>
             <p>Wähle die Läufe aus, die du importieren möchtest.</p>
 
