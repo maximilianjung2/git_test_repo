@@ -74,6 +74,7 @@ $trainingTypes = [
                             <th>Min</th>
                             <th>RPE</th>
                             <th>Fitness</th>
+                            <th>Ø Puls</th>
                             <th>Quelle</th>
                             <th>Aktionen</th>
                         </tr>
@@ -130,6 +131,8 @@ $trainingTypes = [
                                     >
                                     <span><?= $entry['fitness_feeling'] !== null ? (int)$entry['fitness_feeling'] : 5 ?></span>
                                 </td>
+
+                                <td><?= $entry['avg_heart_rate'] !== null ? htmlspecialchars((string)$entry['avg_heart_rate']) : '-' ?></td>
 
                                 <td><?= htmlspecialchars($entry['source']) ?></td>
 

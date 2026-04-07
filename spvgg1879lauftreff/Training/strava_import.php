@@ -16,6 +16,7 @@ $importedIds = [];
  * Strava-Button-Asset einen anderen Dateinamen hat.
  */
 $stravaConnectAssetPath = '/training/assets/img/strava/btn_strava_connect_with_orange_x2.png';
+$stravaPoweredByAssetPath = '/training/assets/img/strava/api_logo_pwrdBy_strava_horiz_orange.png';
 
 function renderStravaConnectCta(string $assetPath): void
 {
@@ -33,6 +34,19 @@ function renderStravaConnectCta(string $assetPath): void
             >
         </a>
     </p>
+    <?php
+}
+
+
+function renderPoweredByStrava(string $assetPath): void
+{
+    ?>
+    <div class="strava-powered">
+        <img
+            src="<?= htmlspecialchars($assetPath, ENT_QUOTES, 'UTF-8') ?>"
+            alt="Powered by Strava"
+        >
+    </div>
     <?php
 }
 
@@ -58,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $runsById[(string)$run['id']] = $run;
             }
 
-            $insert = $pdo->prepare("\n                INSERT INTO training_entries (\n                    user_id,\n                    source,\n                    source_activity_id,\n                    activity_date,\n                    title,\n                    sport_type,\n                    distance_km,\n                    duration_min\n                ) VALUES (\n                    :user_id,\n                    'strava',\n                    :source_activity_id,\n                    :activity_date,\n                    :title,\n                    :sport_type,\n                    :distance_km,\n                    :duration_min\n                )\n            ");
+            $insert = $pdo->prepare("\n                INSERT INTO training_entries (\n                    user_id,\n                    source,\n                    source_activity_id,\n                    activity_date,\n                    title,\n                    sport_type,\n                    distance_km,\n                    duration_min,\n                    avg_heart_rate\n                ) VALUES (\n                    :user_id,\n                    'strava',\n                    :source_activity_id,\n                    :activity_date,\n                    :title,\n                    :sport_type,\n                    :distance_km,\n                    :duration_min,\n                    :avg_heart_rate\n                )\n            ");
 
             foreach ($selected as $activityId) {
                 $activityId = (string)$activityId;
@@ -78,6 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         'sport_type' => $run['sport_type'],
                         'distance_km' => $run['distance_km'],
                         'duration_min' => $run['duration_min'],
+                        'avg_heart_rate' => $run['avg_heart_rate'],
                     ]);
                 } catch (PDOException $e) {
                     // Doppelte Imports still ignorieren
@@ -110,6 +125,29 @@ if ($connection && !$stravaError) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Strava Import</title>
     <link rel="stylesheet" href="/training/assets/css/training.css">
+    <style>
+        .strava-powered {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 32px;
+        }
+
+        .strava-powered img {
+            max-width: 180px;
+            width: 100%;
+            height: auto;
+        }
+
+        @media (max-width: 768px) {
+            .strava-powered {
+                justify-content: center;
+            }
+
+            .strava-powered img {
+                max-width: 150px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container wide">
@@ -147,6 +185,7 @@ if ($connection && !$stravaError) {
                                     <th>Titel</th>
                                     <th>km</th>
                                     <th>Min</th>
+                                    <th>Ø Puls</th>
                                     <th>Status</th>
                                 </tr>
                             </thead>
@@ -165,6 +204,7 @@ if ($connection && !$stravaError) {
                                         <td><?= htmlspecialchars($run['name']) ?></td>
                                         <td><?= $run['distance_km'] !== null ? htmlspecialchars(number_format((float)$run['distance_km'], 2, ',', '.')) : '-' ?></td>
                                         <td><?= $run['duration_min'] !== null ? htmlspecialchars((string)$run['duration_min']) : '-' ?></td>
+                                        <td><?= $run['avg_heart_rate'] !== null ? htmlspecialchars((string)$run['avg_heart_rate']) : '-' ?></td>
                                         <td><?= $alreadyImported ? 'Schon importiert' : 'Neu' ?></td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -183,6 +223,7 @@ if ($connection && !$stravaError) {
                 <a class="button" href="/training/dashboard.php">Dashboard</a>
             </p>
         <?php endif; ?>
+        <?php renderPoweredByStrava($stravaPoweredByAssetPath); ?>
     </div>
 </body>
 </html>

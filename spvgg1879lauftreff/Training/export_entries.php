@@ -37,6 +37,7 @@ fputcsv($output, [
     'duration_min',
     'rpe',
     'fitness_feeling',
+    'avg_heart_rate',
     'source',
     'notes',
 ]);
@@ -50,6 +51,7 @@ foreach ($entries as $entry) {
         $entry['duration_min'] !== null ? (string) $entry['duration_min'] : '',
         $entry['rpe'] !== null ? (string) $entry['rpe'] : '',
         $entry['fitness_feeling'] !== null ? (string) $entry['fitness_feeling'] : '',
+        $entry['avg_heart_rate'] !== null ? (string) $entry['avg_heart_rate'] : '',
         (string) ($entry['source'] ?? ''),
         (string) ($entry['notes'] ?? ''),
     ]);

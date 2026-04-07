@@ -195,6 +195,9 @@ function getRecentStravaRuns(PDO $pdo, int $userId, int $limit = 30): array
             'activity_date' => isset($activity['start_date_local'])
                 ? substr($activity['start_date_local'], 0, 10)
                 : null,
+            'avg_heart_rate' => isset($activity['average_heartrate'])
+                ? (int)round((float)$activity['average_heartrate'])
+                : null,
         ];
     }
 

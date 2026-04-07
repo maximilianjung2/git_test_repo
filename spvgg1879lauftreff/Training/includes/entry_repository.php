@@ -15,6 +15,7 @@ function getVisibleEntriesForUser(PDO $pdo, int $userId): array
             duration_min,
             rpe,
             fitness_feeling,
+            avg_heart_rate,
             notes,
             source
         FROM training_entries

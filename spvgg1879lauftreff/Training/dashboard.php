@@ -53,7 +53,7 @@ $stats30 = $stats30Stmt->fetch();
 |--------------------------------------------------------------------------
 */
 $recentStmt = $pdo->prepare("
-    SELECT activity_date, title, distance_km, duration_min, rpe, fitness_feeling
+    SELECT activity_date, title, distance_km, duration_min, rpe, fitness_feeling, avg_heart_rate
     FROM training_entries
     WHERE user_id = :user_id
       AND is_hidden = 0
@@ -230,6 +230,7 @@ $chartData = [
                             <th>Min</th>
                             <th>RPE</th>
                             <th>Fitness</th>
+                            <th>Ø Puls</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -241,6 +242,7 @@ $chartData = [
                                 <td><?= $entry['duration_min'] !== null ? htmlspecialchars((string)$entry['duration_min']) : '-' ?></td>
                                 <td><?= $entry['rpe'] !== null ? htmlspecialchars((string)$entry['rpe']) : '-' ?></td>
                                 <td><?= $entry['fitness_feeling'] !== null ? htmlspecialchars((string)$entry['fitness_feeling']) : '-' ?></td>
+                                <td><?= $entry['avg_heart_rate'] !== null ? htmlspecialchars((string)$entry['avg_heart_rate']) : '-' ?></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>

@@ -26,6 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $durationMin = $_POST['duration_min'] !== '' ? (int)$_POST['duration_min'] : null;
     $rpe = $_POST['rpe'] !== '' ? (int)$_POST['rpe'] : null;
     $fitnessFeeling = $_POST['fitness_feeling'] !== '' ? (int)$_POST['fitness_feeling'] : null;
+    $avgHeartRate = isset($_POST['avg_heart_rate']) && $_POST['avg_heart_rate'] !== '' ? (int)$_POST['avg_heart_rate'] : null;
     $notes = trim($_POST['notes'] ?? '');
 
     if (!$activityDate) {
@@ -49,6 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 duration_min,
                 rpe,
                 fitness_feeling,
+                avg_heart_rate,
                 notes
             ) VALUES (
                 :user_id,
@@ -61,6 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 :duration_min,
                 :rpe,
                 :fitness_feeling,
+                :avg_heart_rate,
                 :notes
             )
         ");
@@ -75,6 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'duration_min' => $durationMin,
             'rpe' => $rpe,
             'fitness_feeling' => $fitnessFeeling,
+            'avg_heart_rate' => $avgHeartRate,
             'notes' => $notes !== '' ? $notes : null,
         ]);
 
@@ -137,6 +141,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <p>
                 <input type="number" min="1" max="10" name="fitness_feeling" placeholder="Fitnessgefühl (1-10)" value="<?= htmlspecialchars($_POST['fitness_feeling'] ?? '') ?>">
+            </p>
+
+            <p>
+                <input type="number" min="30" max="250" name="avg_heart_rate" placeholder="Ø Puls (bpm)" value="<?= htmlspecialchars($_POST['avg_heart_rate'] ?? '') ?>">
             </p>
 
             <p>
