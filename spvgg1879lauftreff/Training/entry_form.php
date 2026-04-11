@@ -5,7 +5,6 @@ requireLogin();
 require __DIR__ . '/includes/db.php';
 
 $error = '';
-$success = '';
 
 $trainingTypes = [
     'Locker',
@@ -22,10 +21,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = trim($_POST['title'] ?? '');
     $sportType = trim($_POST['sport_type'] ?? 'Run');
     $trainingType = trim($_POST['training_type'] ?? '');
-    $distanceKm = $_POST['distance_km'] !== '' ? (float)$_POST['distance_km'] : null;
-    $durationMin = $_POST['duration_min'] !== '' ? (int)$_POST['duration_min'] : null;
-    $rpe = $_POST['rpe'] !== '' ? (int)$_POST['rpe'] : null;
-    $fitnessFeeling = $_POST['fitness_feeling'] !== '' ? (int)$_POST['fitness_feeling'] : null;
+    $distanceKm = isset($_POST['distance_km']) && $_POST['distance_km'] !== '' ? (float)$_POST['distance_km'] : null;
+    $durationMin = isset($_POST['duration_min']) && $_POST['duration_min'] !== '' ? (int)$_POST['duration_min'] : null;
+    $rpe = isset($_POST['rpe']) && $_POST['rpe'] !== '' ? (int)$_POST['rpe'] : null;
+    $fitnessFeeling = isset($_POST['fitness_feeling']) && $_POST['fitness_feeling'] !== '' ? (int)$_POST['fitness_feeling'] : null;
     $avgHeartRate = isset($_POST['avg_heart_rate']) && $_POST['avg_heart_rate'] !== '' ? (int)$_POST['avg_heart_rate'] : null;
     $notes = trim($_POST['notes'] ?? '');
 
@@ -86,77 +85,95 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 }
+
+$pageTitle = 'Neue Einheit';
+require __DIR__ . '/includes/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Neue Einheit - Trainingsbereich</title>
-    <link rel="stylesheet" href="/training/assets/css/training.css">
-</head>
-<body>
-    <div class="container">
-        <h1>Neue Einheit eintragen</h1>
+<div class="container">
+    <h1>Neue Einheit eintragen</h1>
 
-        <?php if ($error): ?>
-            <p style="color:red;"><?= htmlspecialchars($error) ?></p>
-        <?php endif; ?>
+    <?php if ($error): ?>
+        <div class="alert alert-error"><?= htmlspecialchars($error) ?></div>
+    <?php endif; ?>
 
-        <form method="post">
-            <p>
-                <input type="date" name="activity_date" value="<?= htmlspecialchars($_POST['activity_date'] ?? date('Y-m-d')) ?>" required>
-            </p>
+    <form method="post">
+        <div class="form-group">
+            <label for="activity_date">Datum</label>
+            <input type="date" id="activity_date" name="activity_date"
+                value="<?= htmlspecialchars($_POST['activity_date'] ?? date('Y-m-d')) ?>" required>
+        </div>
 
-            <p>
-                <input type="text" name="title" placeholder="Titel, z. B. Lockerer Dauerlauf" value="<?= htmlspecialchars($_POST['title'] ?? '') ?>" required>
-            </p>
+        <div class="form-group">
+            <label for="title">Titel</label>
+            <input type="text" id="title" name="title"
+                placeholder="z. B. Lockerer Dauerlauf"
+                value="<?= htmlspecialchars($_POST['title'] ?? '') ?>" required>
+        </div>
 
-            <p>
-                <input type="text" name="sport_type" placeholder="Sportart, z. B. Run" value="<?= htmlspecialchars($_POST['sport_type'] ?? 'Run') ?>">
-            </p>
+        <div class="form-group">
+            <label for="sport_type">Sportart</label>
+            <input type="text" id="sport_type" name="sport_type"
+                placeholder="z. B. Run"
+                value="<?= htmlspecialchars($_POST['sport_type'] ?? 'Run') ?>">
+        </div>
 
-            <p>
-                <select name="training_type">
-                    <option value="">Einheitstyp wählen</option>
-                    <?php foreach ($trainingTypes as $type): ?>
-                        <option value="<?= htmlspecialchars($type) ?>" <?= (($_POST['training_type'] ?? '') === $type) ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($type) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </p>
+        <div class="form-group">
+            <label for="training_type">Einheitstyp</label>
+            <select id="training_type" name="training_type">
+                <option value="">Bitte wählen</option>
+                <?php foreach ($trainingTypes as $type): ?>
+                    <option value="<?= htmlspecialchars($type) ?>" <?= (($_POST['training_type'] ?? '') === $type) ? 'selected' : '' ?>>
+                        <?= htmlspecialchars($type) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
 
-            <p>
-                <input type="number" step="0.01" min="0" name="distance_km" placeholder="Distanz in km" value="<?= htmlspecialchars($_POST['distance_km'] ?? '') ?>">
-            </p>
+        <div class="form-group">
+            <label for="distance_km">Distanz (km)</label>
+            <input type="number" id="distance_km" name="distance_km" step="0.01" min="0"
+                placeholder="z. B. 10.5"
+                value="<?= htmlspecialchars($_POST['distance_km'] ?? '') ?>">
+        </div>
 
-            <p>
-                <input type="number" min="0" name="duration_min" placeholder="Dauer in Minuten" value="<?= htmlspecialchars($_POST['duration_min'] ?? '') ?>">
-            </p>
+        <div class="form-group">
+            <label for="duration_min">Dauer (Minuten)</label>
+            <input type="number" id="duration_min" name="duration_min" min="0"
+                placeholder="z. B. 60"
+                value="<?= htmlspecialchars($_POST['duration_min'] ?? '') ?>">
+        </div>
 
-            <p>
-                <input type="number" min="1" max="10" name="rpe" placeholder="RPE (1-10)" value="<?= htmlspecialchars($_POST['rpe'] ?? '') ?>">
-            </p>
+        <div class="form-group">
+            <label for="rpe">RPE – subjektive Anstrengung (1–10)</label>
+            <input type="number" id="rpe" name="rpe" min="1" max="10"
+                placeholder="1 = sehr leicht, 10 = maximal"
+                value="<?= htmlspecialchars($_POST['rpe'] ?? '') ?>">
+        </div>
 
-            <p>
-                <input type="number" min="1" max="10" name="fitness_feeling" placeholder="Fitnessgefühl (1-10)" value="<?= htmlspecialchars($_POST['fitness_feeling'] ?? '') ?>">
-            </p>
+        <div class="form-group">
+            <label for="fitness_feeling">Fitnessgefühl (1–10)</label>
+            <input type="number" id="fitness_feeling" name="fitness_feeling" min="1" max="10"
+                placeholder="1 = sehr schlecht, 10 = top"
+                value="<?= htmlspecialchars($_POST['fitness_feeling'] ?? '') ?>">
+        </div>
 
-            <p>
-                <input type="number" min="30" max="250" name="avg_heart_rate" placeholder="Ø Puls (bpm)" value="<?= htmlspecialchars($_POST['avg_heart_rate'] ?? '') ?>">
-            </p>
+        <div class="form-group">
+            <label for="avg_heart_rate">Ø Puls (bpm)</label>
+            <input type="number" id="avg_heart_rate" name="avg_heart_rate" min="30" max="250"
+                placeholder="z. B. 148"
+                value="<?= htmlspecialchars($_POST['avg_heart_rate'] ?? '') ?>">
+        </div>
 
-            <p>
-                <textarea name="notes" placeholder="Notizen" rows="5"><?= htmlspecialchars($_POST['notes'] ?? '') ?></textarea>
-            </p>
+        <div class="form-group">
+            <label for="notes">Notizen</label>
+            <textarea id="notes" name="notes" rows="5"
+                placeholder="Tagesform, Wetter, Besonderheiten ..."><?= htmlspecialchars($_POST['notes'] ?? '') ?></textarea>
+        </div>
 
-            <p>
-                <button type="submit">Einheit speichern</button>
-            </p>
-        </form>
-
-        <p><a class="button" href="/training/dashboard.php">Zurück zum Dashboard</a></p>
-    </div>
-</body>
-</html>
+        <div class="form-actions">
+            <button type="submit">Einheit speichern</button>
+            <a class="button btn-secondary" href="/training/entries.php">Abbrechen</a>
+        </div>
+    </form>
+</div>
+<?php require __DIR__ . '/includes/footer.php'; ?>

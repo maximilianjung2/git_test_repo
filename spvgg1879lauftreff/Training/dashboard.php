@@ -149,197 +149,173 @@ $chartData = [
     'load30' => $load30,
     'fitness7' => $fitness7,
 ];
+
+$pageTitle = 'Dashboard';
+require __DIR__ . '/includes/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Trainingsbereich</title>
-    <link rel="stylesheet" href="/training/assets/css/training.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-    <div class="container wide">
-        <h1>Willkommen im Trainingsbereich</h1>
-        <p>Hallo <?= htmlspecialchars(currentUsername() ?? '') ?>!</p>
+<div class="container wide">
+    <h1>Dashboard</h1>
 
-        <div class="stats-grid">
-            <div class="stat-card">
-                <h3>Kilometer 7 Tage</h3>
-                <p><?= number_format((float)$stats7['km_7'], 2, ',', '.') ?> km</p>
-            </div>
-            <div class="stat-card">
-                <h3>Belastung 7 Tage</h3>
-                <p><?= (int)$stats7['load_7'] ?></p>
-            </div>
-            <div class="stat-card">
-                <h3>Ø Fitness 7 Tage</h3>
-                <p><?= $stats7['fitness_7'] !== null ? htmlspecialchars((string)$stats7['fitness_7']) : '-' ?></p>
-            </div>
-            <div class="stat-card">
-                <h3>Kilometer 30 Tage</h3>
-                <p><?= number_format((float)$stats30['km_30'], 2, ',', '.') ?> km</p>
-            </div>
-            <div class="stat-card">
-                <h3>Belastung 30 Tage</h3>
-                <p><?= (int)$stats30['load_30'] ?></p>
-            </div>
-            <div class="stat-card">
-                <h3>Ø Fitness 30 Tage</h3>
-                <p><?= $stats30['fitness_30'] !== null ? htmlspecialchars((string)$stats30['fitness_30']) : '-' ?></p>
-            </div>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>Kilometer 7 Tage</h3>
+            <p><?= number_format((float)$stats7['km_7'], 2, ',', '.') ?> km</p>
         </div>
-
-        <p>
-            <a class="button" href="/training/entry_form.php">Neue Einheit eintragen</a>
-            <a class="button" href="/training/entries.php">Meine Einheiten</a>
-            <a class="button" href="/training/strava_import.php">Strava-Import</a>
-            <a class="button" href="/training/wiki.php">Wiki / Hilfe</a>
-
-            <?php if (isAdmin()): ?>
-                <a class="button" href="/training/admin_users.php">Admin Nutzer</a>
-            <?php endif; ?>
-            <a class="button" href="/training/logout.php">Logout</a>
-        </p>
-
-        <h2>Formkurve</h2>
-        <div class="chart-toolbar">
-            <button type="button" class="chart-range-btn active" data-range="7">7 Tage</button>
-            <button type="button" class="chart-range-btn" data-range="30">30 Tage</button>
-            <button type="button" class="chart-range-btn" data-range="90">3 Monate</button>
-            <button type="button" class="chart-range-btn" data-range="180">6 Monate</button>
+        <div class="stat-card">
+            <h3>Belastung 7 Tage</h3>
+            <p><?= (int)$stats7['load_7'] ?></p>
         </div>
-
-        <div class="chart-card">
-            <canvas id="formChart"></canvas>
+        <div class="stat-card">
+            <h3>Ø Fitness 7 Tage</h3>
+            <p><?= $stats7['fitness_7'] !== null ? htmlspecialchars((string)$stats7['fitness_7']) : '-' ?></p>
         </div>
-
-        <h2>Letzte Einheiten</h2>
-
-        <?php if (!$recentEntries): ?>
-            <p>Noch keine Einträge vorhanden.</p>
-        <?php else: ?>
-            <div class="table-wrapper">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Datum</th>
-                            <th>Titel</th>
-                            <th>km</th>
-                            <th>Min</th>
-                            <th>RPE</th>
-                            <th>Fitness</th>
-                            <th>Ø Puls</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($recentEntries as $entry): ?>
-                            <tr>
-                                <td><?= htmlspecialchars($entry['activity_date']) ?></td>
-                                <td><?= htmlspecialchars($entry['title']) ?></td>
-                                <td><?= $entry['distance_km'] !== null ? htmlspecialchars(number_format((float)$entry['distance_km'], 2, ',', '.')) : '-' ?></td>
-                                <td><?= $entry['duration_min'] !== null ? htmlspecialchars((string)$entry['duration_min']) : '-' ?></td>
-                                <td><?= $entry['rpe'] !== null ? htmlspecialchars((string)$entry['rpe']) : '-' ?></td>
-                                <td><?= $entry['fitness_feeling'] !== null ? htmlspecialchars((string)$entry['fitness_feeling']) : '-' ?></td>
-                                <td><?= $entry['avg_heart_rate'] !== null ? htmlspecialchars((string)$entry['avg_heart_rate']) : '-' ?></td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
-        <?php endif; ?>
+        <div class="stat-card">
+            <h3>Kilometer 30 Tage</h3>
+            <p><?= number_format((float)$stats30['km_30'], 2, ',', '.') ?> km</p>
+        </div>
+        <div class="stat-card">
+            <h3>Belastung 30 Tage</h3>
+            <p><?= (int)$stats30['load_30'] ?></p>
+        </div>
+        <div class="stat-card">
+            <h3>Ø Fitness 30 Tage</h3>
+            <p><?= $stats30['fitness_30'] !== null ? htmlspecialchars((string)$stats30['fitness_30']) : '-' ?></p>
+        </div>
     </div>
 
-    <script>
-        const chartData = <?= json_encode($chartData, JSON_UNESCAPED_UNICODE) ?>;
+    <h2>Formkurve</h2>
+    <div class="chart-toolbar">
+        <button type="button" class="chart-range-btn active" data-range="7">7 Tage</button>
+        <button type="button" class="chart-range-btn" data-range="30">30 Tage</button>
+        <button type="button" class="chart-range-btn" data-range="90">3 Monate</button>
+        <button type="button" class="chart-range-btn" data-range="180">6 Monate</button>
+    </div>
+    <div class="chart-card">
+        <canvas id="formChart"></canvas>
+    </div>
 
-        function sliceLast(arr, range) {
-            return arr.slice(-range);
+    <h2>Letzte Einheiten</h2>
+    <?php if (!$recentEntries): ?>
+        <p>Noch keine Einträge vorhanden.</p>
+    <?php else: ?>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Datum</th>
+                        <th>Titel</th>
+                        <th>km</th>
+                        <th>Min</th>
+                        <th>RPE</th>
+                        <th>Fitness</th>
+                        <th>Ø Puls</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($recentEntries as $entry): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($entry['activity_date']) ?></td>
+                            <td><?= htmlspecialchars($entry['title']) ?></td>
+                            <td><?= $entry['distance_km'] !== null ? htmlspecialchars(number_format((float)$entry['distance_km'], 2, ',', '.')) : '-' ?></td>
+                            <td><?= $entry['duration_min'] !== null ? htmlspecialchars((string)$entry['duration_min']) : '-' ?></td>
+                            <td><?= $entry['rpe'] !== null ? htmlspecialchars((string)$entry['rpe']) : '-' ?></td>
+                            <td><?= $entry['fitness_feeling'] !== null ? htmlspecialchars((string)$entry['fitness_feeling']) : '-' ?></td>
+                            <td><?= $entry['avg_heart_rate'] !== null ? htmlspecialchars((string)$entry['avg_heart_rate']) : '-' ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    <?php endif; ?>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const chartData = <?= json_encode($chartData, JSON_UNESCAPED_UNICODE) ?>;
+
+    function sliceLast(arr, range) {
+        return arr.slice(-range);
+    }
+
+    const ctx = document.getElementById('formChart');
+    let formChart;
+
+    function buildChart(range) {
+        const labels = sliceLast(chartData.labels, range);
+        const load7 = sliceLast(chartData.load7, range);
+        const load30 = sliceLast(chartData.load30, range);
+        const fitness7 = sliceLast(chartData.fitness7, range);
+
+        if (formChart) {
+            formChart.destroy();
         }
 
-        const ctx = document.getElementById('formChart');
-        let formChart;
-
-        function buildChart(range) {
-            const labels = sliceLast(chartData.labels, range);
-            const load7 = sliceLast(chartData.load7, range);
-            const load30 = sliceLast(chartData.load30, range);
-            const fitness7 = sliceLast(chartData.fitness7, range);
-
-            if (formChart) {
-                formChart.destroy();
-            }
-
-            formChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: 'Belastung 7 Tage',
-                            data: load7,
-                            yAxisID: 'yLoad',
-                            tension: 0.25
-                        },
-                        {
-                            label: 'Belastung 30 Tage',
-                            data: load30,
-                            yAxisID: 'yLoad',
-                            tension: 0.25
-                        },
-                        {
-                            label: 'Fitness 7 Tage',
-                            data: fitness7,
-                            yAxisID: 'yFitness',
-                            tension: 0.25
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    interaction: {
-                        mode: 'index',
-                        intersect: false
+        formChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Belastung 7 Tage',
+                        data: load7,
+                        yAxisID: 'yLoad',
+                        tension: 0.25,
+                        borderColor: '#1d4ed8',
+                        backgroundColor: 'rgba(29,78,216,0.08)',
                     },
-                    maintainAspectRatio: false,
-                    scales: {
-                        yLoad: {
-                            type: 'linear',
-                            position: 'left',
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Belastung'
-                            }
-                        },
-                        yFitness: {
-                            type: 'linear',
-                            position: 'right',
-                            min: 0,
-                            max: 10,
-                            grid: {
-                                drawOnChartArea: false
-                            },
-                            title: {
-                                display: true,
-                                text: 'Fitness'
-                            }
-                        }
+                    {
+                        label: 'Belastung 30 Tage',
+                        data: load30,
+                        yAxisID: 'yLoad',
+                        tension: 0.25,
+                        borderColor: '#93c5fd',
+                        backgroundColor: 'rgba(147,197,253,0.08)',
+                    },
+                    {
+                        label: 'Fitness 7 Tage',
+                        data: fitness7,
+                        yAxisID: 'yFitness',
+                        tension: 0.25,
+                        borderColor: '#dc2626',
+                        backgroundColor: 'rgba(220,38,38,0.08)',
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                maintainAspectRatio: false,
+                scales: {
+                    yLoad: {
+                        type: 'linear',
+                        position: 'left',
+                        beginAtZero: true,
+                        title: { display: true, text: 'Belastung' }
+                    },
+                    yFitness: {
+                        type: 'linear',
+                        position: 'right',
+                        min: 0,
+                        max: 10,
+                        grid: { drawOnChartArea: false },
+                        title: { display: true, text: 'Fitness' }
                     }
                 }
-            });
-        }
-
-        document.querySelectorAll('.chart-range-btn').forEach(button => {
-            button.addEventListener('click', () => {
-                document.querySelectorAll('.chart-range-btn').forEach(btn => btn.classList.remove('active'));
-                button.classList.add('active');
-                buildChart(parseInt(button.dataset.range, 10));
-            });
+            }
         });
+    }
 
-        buildChart(7);
-    </script>
-</body>
-</html>
+    document.querySelectorAll('.chart-range-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            document.querySelectorAll('.chart-range-btn').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            buildChart(parseInt(button.dataset.range, 10));
+        });
+    });
+
+    buildChart(7);
+</script>
+<?php require __DIR__ . '/includes/footer.php'; ?>

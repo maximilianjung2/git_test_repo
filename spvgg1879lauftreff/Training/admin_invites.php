@@ -54,94 +54,92 @@ $invites = $inviteStmt->fetchAll();
 
 $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
 $host = $_SERVER['HTTP_HOST'];
+
+$pageTitle = 'Invite-Verwaltung';
+require __DIR__ . '/includes/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Invites - Trainingsbereich</title>
-    <link rel="stylesheet" href="/training/assets/css/training.css">
-</head>
-<body>
-    <div class="container wide">
-        <h1>Invite-Verwaltung</h1>
-        <p>Neue Einladungslinks erstellen und bestehende Invites im Blick behalten.</p>
+<div class="container wide">
+    <h1>Invite-Verwaltung</h1>
+    <p class="muted">Neue Einladungslinks erstellen und bestehende Invites im Blick behalten.</p>
 
-        <p>
-            <a class="button" href="/training/dashboard.php">Dashboard</a>
-            <a class="button" href="/training/admin_users.php">Nutzerverwaltung</a>
-        </p>
+    <?php if ($error): ?>
+        <div class="alert alert-error"><?= htmlspecialchars($error) ?></div>
+    <?php endif; ?>
 
-        <?php if ($error): ?>
-            <p style="color:red;"><?= htmlspecialchars($error) ?></p>
-        <?php endif; ?>
+    <?php if ($successLink): ?>
+        <div class="alert alert-success">
+            <strong>Invite erstellt.</strong> Dieser Link ist 48 Stunden gültig und wird nur einmalig angezeigt:
+        </div>
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px 16px; margin-bottom:20px; word-break:break-all; font-family:monospace; font-size:0.875rem;">
+            <?= htmlspecialchars($successLink) ?>
+        </div>
+    <?php endif; ?>
 
-        <form method="post">
-            <p>
-                <input type="email" name="email" placeholder="E-Mail-Adresse" required>
-            </p>
-            <p>
-                <button type="submit">Invite erzeugen</button>
-            </p>
-        </form>
-
-        <?php if ($successLink): ?>
-            <hr>
-            <p style="color:green;"><strong>Invite erstellt.</strong></p>
-            <p><strong>Neuer Invite-Link:</strong></p>
-            <p style="word-break: break-all;"><?= htmlspecialchars($successLink) ?></p>
-        <?php endif; ?>
-
-        <h2>Bestehende Invites</h2>
-
-        <?php if (!$invites): ?>
-            <p>Es sind noch keine Invites vorhanden.</p>
-        <?php else: ?>
-            <div class="table-wrapper">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>E-Mail</th>
-                            <th>Status</th>
-                            <th>Erstellt am</th>
-                            <th>Gültig bis</th>
-                            <th>Genutzt am</th>
-                            <th>Registrierungslink</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($invites as $invite): ?>
-                            <?php
-                            $status = 'offen';
-                            if (!empty($invite['used_at'])) {
-                                $status = 'genutzt';
-                            } elseif (strtotime((string)$invite['expires_at']) < time()) {
-                                $status = 'abgelaufen';
-                            }
-                            ?>
-                            <tr>
-                                <td><?= htmlspecialchars($invite['email']) ?></td>
-                                <td><?= htmlspecialchars($status) ?></td>
-                                <td><?= $invite['created_at'] ? htmlspecialchars((string)$invite['created_at']) : '-' ?></td>
-                                <td><?= htmlspecialchars((string)$invite['expires_at']) ?></td>
-                                <td><?= $invite['used_at'] ? htmlspecialchars((string)$invite['used_at']) : '-' ?></td>
-                                <td>
-                                    <?php if ($status === 'offen'): ?>
-                                        <span style="word-break: break-all;">
-                                            <?= htmlspecialchars($scheme . '://' . $host . '/training/register.php?token=[nur-neu-erzeugte-links-sichtbar]') ?>
-                                        </span>
-                                        <br><small>Aus Sicherheitsgründen wird der echte Token nur direkt nach dem Erzeugen angezeigt.</small>
-                                    <?php else: ?>
-                                        -
-                                    <?php endif; ?>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
-        <?php endif; ?>
+    <div class="page-actions">
+        <a class="button btn-secondary" href="/training/admin_users.php">Nutzerverwaltung</a>
     </div>
-</body>
-</html>
+
+    <h2>Neuen Invite erzeugen</h2>
+    <form method="post">
+        <div class="form-group">
+            <label for="email">E-Mail-Adresse des einzuladenden Nutzers</label>
+            <input type="email" id="email" name="email" placeholder="name@beispiel.de" required>
+        </div>
+        <div class="form-actions">
+            <button type="submit">Invite erzeugen</button>
+        </div>
+    </form>
+
+    <h2>Bestehende Invites</h2>
+
+    <?php if (!$invites): ?>
+        <p>Es sind noch keine Invites vorhanden.</p>
+    <?php else: ?>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>E-Mail</th>
+                        <th>Status</th>
+                        <th>Erstellt am</th>
+                        <th>Gültig bis</th>
+                        <th>Genutzt am</th>
+                        <th>Registrierungslink</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($invites as $invite): ?>
+                        <?php
+                        $isUsed = !empty($invite['used_at']);
+                        $isExpired = !$isUsed && strtotime((string)$invite['expires_at']) < time();
+                        $status = $isUsed ? 'genutzt' : ($isExpired ? 'abgelaufen' : 'offen');
+                        ?>
+                        <tr>
+                            <td><?= htmlspecialchars($invite['email']) ?></td>
+                            <td>
+                                <?php if ($status === 'offen'): ?>
+                                    <span class="badge badge-blue">offen</span>
+                                <?php elseif ($status === 'genutzt'): ?>
+                                    <span class="badge badge-green">genutzt</span>
+                                <?php else: ?>
+                                    <span class="badge badge-red">abgelaufen</span>
+                                <?php endif; ?>
+                            </td>
+                            <td><?= $invite['created_at'] ? htmlspecialchars(substr((string)$invite['created_at'], 0, 10)) : '-' ?></td>
+                            <td><?= htmlspecialchars(substr((string)$invite['expires_at'], 0, 10)) ?></td>
+                            <td><?= $invite['used_at'] ? htmlspecialchars(substr((string)$invite['used_at'], 0, 10)) : '-' ?></td>
+                            <td>
+                                <?php if ($status === 'offen'): ?>
+                                    <small>Nur direkt nach dem Erzeugen sichtbar.</small>
+                                <?php else: ?>
+                                    –
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    <?php endif; ?>
+</div>
+<?php require __DIR__ . '/includes/footer.php'; ?>

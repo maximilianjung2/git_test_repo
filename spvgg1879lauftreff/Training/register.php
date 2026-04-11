@@ -102,53 +102,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
+
+$pageTitle = 'Registrierung';
+require __DIR__ . '/includes/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registrierung</title>
-    <link rel="stylesheet" href="/training/assets/css/training.css">
-</head>
-<body>
-    <div class="container">
-        <h1>Registrierung</h1>
+<div class="auth-box">
+    <h1>Konto erstellen</h1>
+    <p class="auth-sub">Eingeladen für: <strong><?= htmlspecialchars($invite['email']) ?></strong></p>
 
-        <?php if ($success): ?>
-            <p style="color:green;">Dein Konto wurde erfolgreich erstellt.</p>
-            <p><a class="button" href="/training/login.php">Zum Login</a></p>
-        <?php else: ?>
-            <p>Eingeladen für: <strong><?= htmlspecialchars($invite['email']) ?></strong></p>
-
-            <?php if ($error): ?>
-                <p style="color:red;"><?= htmlspecialchars($error) ?></p>
-            <?php endif; ?>
-
-            <form method="post">
-                <input type="hidden" name="token" value="<?= htmlspecialchars($token) ?>">
-
-                <p>
-                    <input type="email" name="email" value="<?= htmlspecialchars($invite['email']) ?>" required readonly>
-                </p>
-
-                <p>
-                    <input type="text" name="username" placeholder="Benutzername" value="<?= htmlspecialchars($_POST['username'] ?? '') ?>" required>
-                </p>
-
-                <p>
-                    <input type="password" name="password" placeholder="Passwort (mind. 8 Zeichen)" required>
-                </p>
-
-                <p>
-                    <input type="password" name="password_repeat" placeholder="Passwort wiederholen" required>
-                </p>
-
-                <p>
-                    <button type="submit">Konto erstellen</button>
-                </p>
-            </form>
+    <?php if ($success): ?>
+        <div class="alert alert-success">Dein Konto wurde erfolgreich erstellt.</div>
+        <div class="form-actions">
+            <a class="button" href="/training/login.php">Zum Login</a>
+        </div>
+    <?php else: ?>
+        <?php if ($error): ?>
+            <div class="alert alert-error"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
-    </div>
-</body>
-</html>
+
+        <form method="post">
+            <input type="hidden" name="token" value="<?= htmlspecialchars($token) ?>">
+
+            <div class="form-group">
+                <label for="email">E-Mail-Adresse</label>
+                <input type="email" id="email" name="email" value="<?= htmlspecialchars($invite['email']) ?>" required readonly>
+            </div>
+            <div class="form-group">
+                <label for="username">Benutzername</label>
+                <input type="text" id="username" name="username" value="<?= htmlspecialchars($_POST['username'] ?? '') ?>" required autofocus>
+            </div>
+            <div class="form-group">
+                <label for="password">Passwort <span class="muted">(mind. 8 Zeichen)</span></label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div class="form-group">
+                <label for="password_repeat">Passwort wiederholen</label>
+                <input type="password" id="password_repeat" name="password_repeat" required>
+            </div>
+            <div class="form-actions">
+                <button type="submit">Konto erstellen</button>
+            </div>
+        </form>
+    <?php endif; ?>
+</div>
+<?php require __DIR__ . '/includes/footer.php'; ?>

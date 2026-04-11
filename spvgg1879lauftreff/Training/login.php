@@ -29,34 +29,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Benutzername/E-Mail oder Passwort ist falsch.';
     }
 }
+
+$pageTitle = 'Login';
+require __DIR__ . '/includes/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Trainingsbereich</title>
-    <link rel="stylesheet" href="/training/assets/css/training.css">
-</head>
-<body>
-    <div class="container">
-        <h1>Trainingsbereich Login</h1>
+<div class="auth-box">
+    <h1>Trainingsbereich</h1>
+    <p class="auth-sub">Melde dich an, um fortzufahren.</p>
 
-        <?php if ($error): ?>
-            <p style="color:red;"><?= htmlspecialchars($error) ?></p>
-        <?php endif; ?>
+    <?php if ($error): ?>
+        <div class="alert alert-error"><?= htmlspecialchars($error) ?></div>
+    <?php endif; ?>
 
-        <form method="post">
-            <p>
-                <input type="text" name="login" placeholder="Benutzername oder E-Mail" required>
-            </p>
-            <p>
-                <input type="password" name="password" placeholder="Passwort" required>
-            </p>
-            <p>
-                <button class="button" type="submit">Einloggen</button>
-            </p>
-        </form>
-    </div>
-</body>
-</html>
+    <form method="post">
+        <div class="form-group">
+            <label for="login">Benutzername oder E-Mail</label>
+            <input type="text" id="login" name="login" value="<?= htmlspecialchars($_POST['login'] ?? '') ?>" required autofocus>
+        </div>
+        <div class="form-group">
+            <label for="password">Passwort</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <div class="form-actions">
+            <button type="submit">Einloggen</button>
+        </div>
+    </form>
+</div>
+<?php require __DIR__ . '/includes/footer.php'; ?>
