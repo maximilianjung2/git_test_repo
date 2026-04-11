@@ -135,6 +135,11 @@ body.auth-body {
     width: min(96%, 1100px);
 }
 
+.container.stretch {
+    width: 80%;
+    max-width: 2400px;
+}
+
 h1 {
     margin-top: 0;
     color: #1e293b;
@@ -334,6 +339,105 @@ th {
     border-bottom: 1px solid #e2e8f0;
     text-align: left;
     white-space: nowrap;
+    position: relative;
+}
+
+/* === Resizable columns === */
+.resizable-table {
+    table-layout: fixed;
+    width: max-content;
+    min-width: 100%;
+}
+
+.resize-handle {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    cursor: col-resize;
+    background: transparent;
+    user-select: none;
+    z-index: 1;
+}
+
+.resize-handle:hover {
+    background: linear-gradient(to right, transparent 2px, #1d4ed8 2px, #1d4ed8 4px, transparent 4px);
+}
+
+.resize-handle.is-resizing {
+    background: linear-gradient(to right, transparent 2px, #1d4ed8 2px, #1d4ed8 4px, transparent 4px);
+}
+
+/* === Column toggle controls === */
+.col-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px 14px;
+    flex-wrap: wrap;
+    margin: 14px 0 4px;
+    padding: 8px 12px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.8rem;
+}
+
+.col-controls-label {
+    font-weight: 600;
+    color: #475569;
+    margin-right: 4px;
+    white-space: nowrap;
+}
+
+.col-toggle-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    color: #475569;
+    user-select: none;
+}
+
+.col-toggle-item input[type="checkbox"] {
+    accent-color: #1d4ed8;
+    cursor: pointer;
+    width: 14px;
+    height: 14px;
+}
+
+.col-controls-sep {
+    width: 1px;
+    height: 16px;
+    background: #e2e8f0;
+    margin: 0 4px;
+}
+
+.width-presets {
+    display: flex;
+    gap: 4px;
+}
+
+.width-presets button {
+    background: none;
+    border: 1px solid #e2e8f0;
+    border-radius: 5px;
+    color: #475569;
+    font-size: 0.78rem;
+    padding: 2px 8px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.width-presets button:hover {
+    border-color: #1d4ed8;
+    color: #1d4ed8;
+}
+
+.width-presets button.active {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+    color: #fff;
 }
 
 td {
@@ -360,15 +464,19 @@ small {
 /* === Action links in tables === */
 .actions-cell {
     white-space: nowrap;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
 }
 
 .actions-cell a,
 .action-link-button {
-    display: inline;
+    display: block;
     background: none;
     border: none;
     padding: 0;
-    margin: 0 8px 0 0;
+    margin: 0;
     color: #1d4ed8;
     text-decoration: none;
     font: inherit;
