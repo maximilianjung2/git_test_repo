@@ -17,6 +17,7 @@ $trainingTypes = [
 ];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    verifyCsrf();
     $activityDate = $_POST['activity_date'] ?? '';
     $title = trim($_POST['title'] ?? '');
     $sportType = trim($_POST['sport_type'] ?? 'Run');
@@ -97,6 +98,7 @@ require __DIR__ . '/includes/header.php';
     <?php endif; ?>
 
     <form method="post">
+        <?= csrfField() ?>
         <div class="form-group">
             <label for="activity_date">Datum</label>
             <input type="date" id="activity_date" name="activity_date"

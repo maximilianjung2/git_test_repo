@@ -5,6 +5,7 @@ requireAdmin();
 require __DIR__ . '/includes/db.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['toggle_user_id'])) {
+    verifyCsrf();
     $toggleUserId = (int)($_POST['toggle_user_id'] ?? 0);
 
     if ($toggleUserId > 0) {
@@ -109,6 +110,7 @@ require __DIR__ . '/includes/header.php';
                             <td><?= (int)$user['entry_count'] ?></td>
                             <td class="actions-cell">
                                 <form method="post" class="inline-form" onsubmit="return confirm('Status dieses Nutzers ändern?');">
+                                    <?= csrfField() ?>
                                     <input type="hidden" name="toggle_user_id" value="<?= (int)$user['id'] ?>">
                                     <button type="submit" class="action-link-button">
                                         <?= (int)$user['is_active'] === 1 ? 'deaktivieren' : 'aktivieren' ?>

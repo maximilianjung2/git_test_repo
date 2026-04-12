@@ -4,6 +4,7 @@ require __DIR__ . '/includes/auth.php';
 requireLogin();
 require __DIR__ . '/includes/db.php';
 
+verifyCsrf();
 $id = (int)($_POST['id'] ?? 0);
 $trainingType = trim($_POST['training_type'] ?? '');
 $rpe = isset($_POST['rpe']) && $_POST['rpe'] !== '' ? (int)$_POST['rpe'] : null;

@@ -49,3 +49,39 @@ function requireAdmin(): void
         exit;
     }
 }
+
+// ── CSRF-Schutz ──────────────────────────────────────────────────────────────
+
+/**
+ * Gibt das CSRF-Token der aktuellen Session zurück.
+ * Erzeugt es einmalig, falls noch keines existiert.
+ */
+function csrfToken(): string
+{
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['csrf_token'];
+}
+
+/**
+ * Gibt ein verstecktes HTML-Input-Feld mit dem CSRF-Token zurück.
+ * Verwendung in Formularen: <?= csrfField() ?>
+ */
+function csrfField(): string
+{
+    return '<input type="hidden" name="csrf_token" value="' . htmlspecialchars(csrfToken(), ENT_QUOTES) . '">';
+}
+
+/**
+ * Prüft ob das gesendete CSRF-Token gültig ist.
+ * Bricht die Anfrage mit HTTP 403 ab wenn nicht.
+ */
+function verifyCsrf(): void
+{
+    $token = $_POST['csrf_token'] ?? '';
+    if (!hash_equals(csrfToken(), $token)) {
+        http_response_code(403);
+        exit('Ungültige Anfrage (CSRF-Fehler). Bitte lade die Seite neu und versuche es erneut.');
+    }
+}

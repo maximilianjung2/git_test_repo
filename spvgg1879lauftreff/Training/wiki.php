@@ -24,6 +24,7 @@ require __DIR__ . '/includes/header.php';
             <li><a href="#faq">Nutzer-FAQ</a></li>
             <li><a href="#technik">Technische Dokumentation</a></li>
             <li><a href="#roadmap">Status und nächste Ideen</a></li>
+            <li><a href="/training/changelog.php">Changelog →</a></li>
         </ul>
     </div>
 
@@ -312,6 +313,14 @@ require __DIR__ . '/includes/header.php';
             Das Tool soll bewusst schlank bleiben. Es ist nicht als Ersatz für große Plattformen gedacht,
             sondern als einfache und nützliche Möglichkeit, das eigene Training für sich selbst festzuhalten.
         </p>
+    </div>
+
+    <div class="wiki-note" style="margin-top: 32px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+        <div>
+            <strong>Changelog</strong><br>
+            <span style="font-size:0.9rem; color:#64748b;">Alle Versionen, Features und Sicherheitspatches im Überblick.</span>
+        </div>
+        <a class="button" href="/training/changelog.php">Changelog öffnen →</a>
     </div>
 </div>
 <?php require __DIR__ . '/includes/footer.php'; ?>

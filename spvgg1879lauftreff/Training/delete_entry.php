@@ -4,7 +4,14 @@ require __DIR__ . '/includes/auth.php';
 requireLogin();
 require __DIR__ . '/includes/db.php';
 
-$id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+// Nur POST erlauben — kein Löschen per GET/Link/Prefetch
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    exit('Methode nicht erlaubt.');
+}
+
+verifyCsrf();
+$id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
 
 if ($id > 0) {
     $stmt = $pdo->prepare("
@@ -14,7 +21,7 @@ if ($id > 0) {
         LIMIT 1
     ");
     $stmt->execute([
-        'id' => $id,
+        'id'      => $id,
         'user_id' => currentUserId(),
     ]);
 }

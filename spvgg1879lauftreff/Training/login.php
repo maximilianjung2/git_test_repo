@@ -6,6 +6,7 @@ require __DIR__ . '/includes/auth.php';
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    verifyCsrf();
     $login = trim($_POST['login'] ?? '');
     $password = $_POST['password'] ?? '';
 
@@ -42,6 +43,7 @@ require __DIR__ . '/includes/header.php';
     <?php endif; ?>
 
     <form method="post">
+        <?= csrfField() ?>
         <div class="form-group">
             <label for="login">Benutzername oder E-Mail</label>
             <input type="text" id="login" name="login" value="<?= htmlspecialchars($_POST['login'] ?? '') ?>" required autofocus>

@@ -37,6 +37,7 @@ function renderPoweredByStrava(string $assetPath): void
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    verifyCsrf();
     $selected = $_POST['activity_ids'] ?? [];
 
     if ($connection && is_array($selected) && count($selected) > 0) {
@@ -147,6 +148,7 @@ require __DIR__ . '/includes/header.php';
             <p>Keine Läufe gefunden.</p>
         <?php else: ?>
             <form method="post">
+                <?= csrfField() ?>
                 <div class="table-wrapper">
                     <table>
                         <thead>

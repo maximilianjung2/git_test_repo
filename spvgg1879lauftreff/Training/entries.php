@@ -147,11 +147,16 @@ require __DIR__ . '/includes/header.php';
 
                             <td data-col="aktionen" class="actions-cell">
                                 <form id="<?= $formId ?>" method="post" action="/training/update_quick_entry.php" class="inline-form">
+                                    <?= csrfField() ?>
                                     <input type="hidden" name="id" value="<?= (int)$entry['id'] ?>">
                                     <button type="submit" class="action-link-button">Speichern</button>
                                 </form>
                                 <a href="/training/edit_entry.php?id=<?= (int)$entry['id'] ?>">Details</a>
-                                <a href="/training/delete_entry.php?id=<?= (int)$entry['id'] ?>" onclick="return confirm('Eintrag wirklich löschen?');">Löschen</a>
+                                <form method="post" action="/training/delete_entry.php" class="inline-form" onsubmit="return confirm('Eintrag wirklich löschen?');">
+                                    <?= csrfField() ?>
+                                    <input type="hidden" name="id" value="<?= (int)$entry['id'] ?>">
+                                    <button type="submit" class="action-link-button action-link-danger">Löschen</button>
+                                </form>
                             </td>
                         </tr>
                     <?php endforeach; ?>

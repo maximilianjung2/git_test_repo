@@ -36,6 +36,7 @@ if (!$entry) {
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    verifyCsrf();
     $activityDate = $_POST['activity_date'] ?? '';
     $title = trim($_POST['title'] ?? '');
     $sportType = trim($_POST['sport_type'] ?? 'Run');
@@ -117,6 +118,7 @@ require __DIR__ . '/includes/header.php';
     <?php endif; ?>
 
     <form method="post">
+        <?= csrfField() ?>
         <input type="hidden" name="id" value="<?= (int)$entry['id'] ?>">
 
         <div class="form-group">

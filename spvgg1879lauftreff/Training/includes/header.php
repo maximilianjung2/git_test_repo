@@ -31,6 +31,7 @@ function navClass(string $script, string $current): string {
         <a class="<?= navClass('entry_form.php', $currentScript) ?>" href="/training/entry_form.php">+ Neu</a>
         <a class="<?= $isStravaPage ? 'nav-link active' : 'nav-link' ?>" href="/training/strava_import.php">Strava</a>
         <a class="<?= navClass('wiki.php', $currentScript) ?>" href="/training/wiki.php">Wiki</a>
+        <a class="<?= navClass('changelog.php', $currentScript) ?>" href="/training/changelog.php">Changelog</a>
         <?php if (function_exists('isAdmin') && isAdmin()): ?>
         <a class="<?= $isAdminPage ? 'nav-link active' : 'nav-link' ?>" href="/training/admin_users.php">Admin</a>
         <?php endif; ?>

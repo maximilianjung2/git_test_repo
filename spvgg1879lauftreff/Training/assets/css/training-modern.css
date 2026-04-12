@@ -492,6 +492,10 @@ small {
     background: none;
 }
 
+.action-link-danger {
+    color: #dc2626;
+}
+
 .inline-form {
     display: inline;
     margin: 0 6px 0 0;
@@ -682,6 +686,122 @@ input[type="range"][form] {
 
 .muted {
     color: #64748b;
+}
+
+/* === Changelog === */
+.changelog-entry {
+    margin-top: 36px;
+    padding-bottom: 32px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.changelog-entry:last-child {
+    border-bottom: none;
+}
+
+.changelog-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+}
+
+.changelog-meta {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+}
+
+.changelog-version {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1d4ed8;
+    font-family: 'Consolas', 'Monaco', monospace;
+}
+
+.changelog-date {
+    font-size: 0.875rem;
+    color: #64748b;
+}
+
+.changelog-badges {
+    display: flex;
+    gap: 6px;
+}
+
+.changelog-title {
+    margin: 4px 0 8px 0;
+    font-size: 1.1rem;
+    color: #1e293b;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.changelog-summary {
+    color: #475569;
+    margin-bottom: 20px;
+    line-height: 1.65;
+}
+
+.changelog-fixes {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.changelog-fix {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-left: 4px solid #1d4ed8;
+    border-radius: 8px;
+    padding: 14px 16px;
+}
+
+.changelog-fix-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.changelog-fix-header strong {
+    color: #1e293b;
+    font-size: 0.95rem;
+}
+
+.changelog-fix p {
+    margin: 0 0 10px 0;
+    color: #475569;
+    font-size: 0.9rem;
+    line-height: 1.65;
+}
+
+.changelog-fix p:last-child {
+    margin-bottom: 0;
+}
+
+.changelog-files {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.changelog-files code {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 5px;
+    padding: 1px 7px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.82rem;
+    color: #1d4ed8;
 }
 
 /* === Strava === */

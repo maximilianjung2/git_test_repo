@@ -8,6 +8,7 @@ $error = '';
 $successLink = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'])) {
+    verifyCsrf();
     $email = trim($_POST['email'] ?? '');
 
     if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -34,9 +35,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'])) {
             'expires_at' => $expiresAt,
         ]);
 
-        $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-        $host = $_SERVER['HTTP_HOST'];
-        $successLink = $scheme . '://' . $host . '/training/register.php?token=' . urlencode($token);
+        $appConfig = require __DIR__ . '/includes/config.php';
+        $successLink = rtrim($appConfig['app']['app_url'], '/') . '/register.php?token=' . urlencode($token);
     }
 }
 
@@ -51,9 +51,6 @@ $inviteStmt = $pdo->query("
     ORDER BY created_at DESC, id DESC
 ");
 $invites = $inviteStmt->fetchAll();
-
-$scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-$host = $_SERVER['HTTP_HOST'];
 
 $pageTitle = 'Invite-Verwaltung';
 require __DIR__ . '/includes/header.php';
@@ -81,6 +78,7 @@ require __DIR__ . '/includes/header.php';
 
     <h2>Neuen Invite erzeugen</h2>
     <form method="post">
+        <?= csrfField() ?>
         <div class="form-group">
             <label for="email">E-Mail-Adresse des einzuladenden Nutzers</label>
             <input type="email" id="email" name="email" placeholder="name@beispiel.de" required>

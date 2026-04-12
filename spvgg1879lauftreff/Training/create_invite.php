@@ -36,9 +36,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'expires_at' => $expiresAt,
         ]);
 
-        $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-        $host = $_SERVER['HTTP_HOST'];
-        $successLink = $scheme . '://' . $host . '/training/register.php?token=' . urlencode($token);
+        $appConfig = require __DIR__ . '/includes/config.php';
+        $successLink = rtrim($appConfig['app']['app_url'], '/') . '/register.php?token=' . urlencode($token);
     }
 }
 ?>

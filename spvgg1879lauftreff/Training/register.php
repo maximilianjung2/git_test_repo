@@ -32,6 +32,7 @@ if (!$invite) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    verifyCsrf();
     $username = trim($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
     $passwordRepeat = $_POST['password_repeat'] ?? '';
@@ -121,6 +122,7 @@ require __DIR__ . '/includes/header.php';
         <?php endif; ?>
 
         <form method="post">
+            <?= csrfField() ?>
             <input type="hidden" name="token" value="<?= htmlspecialchars($token) ?>">
 
             <div class="form-group">

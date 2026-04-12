@@ -1,0 +1,12 @@
+# Secrets — niemals committen
+.env
+
+# PHP-Abhängigkeiten (falls später composer genutzt wird)
+/vendor/
+
+# Temporäre Dateien
+*.log
+*.tmp
+*.swp
+.DS_Store
+Thumbs.db
