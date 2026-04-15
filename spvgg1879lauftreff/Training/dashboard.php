@@ -53,7 +53,7 @@ $stats30 = $stats30Stmt->fetch();
 |--------------------------------------------------------------------------
 */
 $recentStmt = $pdo->prepare("
-    SELECT activity_date, title, distance_km, duration_min, rpe, fitness_feeling, avg_heart_rate
+    SELECT id, activity_date, title, distance_km, duration_min, rpe, fitness_feeling, avg_heart_rate
     FROM training_entries
     WHERE user_id = :user_id
       AND is_hidden = 0
@@ -198,7 +198,8 @@ require __DIR__ . '/includes/header.php';
     <?php if (!$recentEntries): ?>
         <p>Noch keine Einträge vorhanden.</p>
     <?php else: ?>
-        <div class="table-wrapper">
+        <!-- Desktop: Tabelle -->
+        <div class="table-wrapper hide-on-mobile">
             <table>
                 <thead>
                     <tr>
@@ -225,6 +226,35 @@ require __DIR__ . '/includes/header.php';
                     <?php endforeach; ?>
                 </tbody>
             </table>
+        </div>
+
+        <!-- Mobile: Cards -->
+        <div class="mobile-card-list">
+            <?php foreach ($recentEntries as $entry): ?>
+                <a class="entry-card" href="/training/edit_entry.php?id=<?= (int)$entry['id'] ?>">
+                    <div class="entry-card-header">
+                        <span class="entry-card-title"><?= htmlspecialchars($entry['title']) ?></span>
+                        <span class="entry-card-date"><?= htmlspecialchars($entry['activity_date']) ?></span>
+                    </div>
+                    <div class="entry-card-stats">
+                        <?php if ($entry['distance_km'] !== null): ?>
+                            <span class="entry-card-stat"><strong><?= htmlspecialchars(number_format((float)$entry['distance_km'], 2, ',', '.')) ?></strong> km</span>
+                        <?php endif; ?>
+                        <?php if ($entry['duration_min'] !== null): ?>
+                            <span class="entry-card-stat"><strong><?= htmlspecialchars((string)$entry['duration_min']) ?></strong> min</span>
+                        <?php endif; ?>
+                        <?php if ($entry['rpe'] !== null): ?>
+                            <span class="entry-card-stat">RPE <strong><?= (int)$entry['rpe'] ?></strong></span>
+                        <?php endif; ?>
+                        <?php if ($entry['fitness_feeling'] !== null): ?>
+                            <span class="entry-card-stat">Fitness <strong><?= (int)$entry['fitness_feeling'] ?></strong></span>
+                        <?php endif; ?>
+                        <?php if ($entry['avg_heart_rate'] !== null): ?>
+                            <span class="entry-card-stat">♥ <strong><?= (int)$entry['avg_heart_rate'] ?></strong></span>
+                        <?php endif; ?>
+                    </div>
+                </a>
+            <?php endforeach; ?>
         </div>
     <?php endif; ?>
 </div>

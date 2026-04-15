@@ -149,7 +149,9 @@ require __DIR__ . '/includes/header.php';
         <?php else: ?>
             <form method="post">
                 <?= csrfField() ?>
-                <div class="table-wrapper">
+
+                <!-- Desktop: Tabelle -->
+                <div class="table-wrapper hide-on-mobile">
                     <table>
                         <thead>
                             <tr>
@@ -190,6 +192,43 @@ require __DIR__ . '/includes/header.php';
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Mobile: Cards -->
+                <div class="strava-card-list">
+                    <?php foreach ($runs as $run): ?>
+                        <?php $alreadyImported = in_array((int)$run['id'], $importedIds, true); ?>
+                        <div class="strava-card <?= $alreadyImported ? 'strava-card-imported' : '' ?>">
+                            <?php if (!$alreadyImported): ?>
+                                <input type="checkbox" name="activity_ids[]" value="<?= (int)$run['id'] ?>">
+                            <?php else: ?>
+                                <span style="width:22px;flex-shrink:0;"></span>
+                            <?php endif; ?>
+                            <div class="strava-card-info">
+                                <div class="strava-card-title"><?= htmlspecialchars($run['name']) ?></div>
+                                <div class="strava-card-meta">
+                                    <?= htmlspecialchars($run['activity_date'] ?? '-') ?>
+                                    <?php if ($run['distance_km'] !== null): ?>
+                                        · <?= htmlspecialchars(number_format((float)$run['distance_km'], 2, ',', '.')) ?> km
+                                    <?php endif; ?>
+                                    <?php if ($run['duration_min'] !== null): ?>
+                                        · <?= htmlspecialchars((string)$run['duration_min']) ?> min
+                                    <?php endif; ?>
+                                    <?php if ($run['avg_heart_rate'] !== null): ?>
+                                        · <?= htmlspecialchars((string)$run['avg_heart_rate']) ?> bpm
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <div class="strava-card-badge">
+                                <?php if ($alreadyImported): ?>
+                                    <span class="badge badge-gray">✓</span>
+                                <?php else: ?>
+                                    <span class="badge badge-blue">Neu</span>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+
                 <div class="form-actions" style="margin-top: 16px;">
                     <button type="submit">Ausgewählte Läufe importieren</button>
                 </div>

@@ -16,6 +16,128 @@ require __DIR__ . '/includes/header.php';
     </div>
 
     <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- Version 1.2.0 — Mobile UX & PWA                       -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div class="changelog-entry" id="v1-2-0">
+        <div class="changelog-header">
+            <div class="changelog-meta">
+                <span class="changelog-version">v1.2.0</span>
+                <span class="changelog-date">15. April 2026</span>
+            </div>
+            <div class="changelog-badges">
+                <span class="badge badge-blue">Feature</span>
+            </div>
+        </div>
+
+        <h2 class="changelog-title">Mobile UX & Progressive Web App</h2>
+        <p class="changelog-summary">
+            Die App ist jetzt vollständig auf die mobile Nutzung ausgerichtet — insbesondere
+            für den typischen Workflow: Lauf beenden, Strava importieren, Notiz und Bewertung eintragen.
+            Zusätzlich ist die App als PWA installierbar und verhält sich auf dem Homescreen
+            wie eine native App.
+        </p>
+
+        <div class="changelog-fixes">
+
+            <div class="changelog-fix">
+                <div class="changelog-fix-header">
+                    <span class="badge badge-blue">Feature</span>
+                    <strong>Progressive Web App (PWA)</strong>
+                </div>
+                <p>
+                    Die App kann auf iOS und Android über „Zum Home-Bildschirm hinzufügen" installiert werden.
+                    Sie öffnet sich dann im Vollbild ohne Browser-Leiste und verhält sich wie eine native App.
+                    Ein Service Worker cached statische Assets für schnellere Ladezeiten.
+                    Kein App-Store, kein Update-Prozess — Änderungen am Server sind sofort aktiv.
+                </p>
+                <div class="changelog-files">
+                    <span>Neu:</span>
+                    <code>manifest.json</code>
+                    <code>sw.js</code>
+                    <code>assets/icons/icon-192.png</code>
+                    <code>assets/icons/icon-512.png</code>
+                    <span style="margin-left:8px;">Geändert:</span>
+                    <code>includes/header.php</code>
+                </div>
+            </div>
+
+            <div class="changelog-fix">
+                <div class="changelog-fix-header">
+                    <span class="badge badge-blue">Feature</span>
+                    <strong>Bottom Navigation</strong>
+                </div>
+                <p>
+                    Auf mobilen Geräten ersetzt eine fixe Bottom-Navigation die Desktop-Menüleiste.
+                    Die vier Hauptfunktionen — Dashboard, Einheiten, Strava, Neu — sind direkt am
+                    Daumenrand erreichbar. Ein „···"-Button öffnet ein Bottom-Sheet mit Wiki,
+                    Changelog und (für Admins) den Admin-Bereichen.
+                </p>
+                <div class="changelog-files">
+                    <span>Geändert:</span>
+                    <code>includes/header.php</code>
+                    <code>assets/css/training-modern.css</code>
+                </div>
+            </div>
+
+            <div class="changelog-fix">
+                <div class="changelog-fix-header">
+                    <span class="badge badge-blue">Feature</span>
+                    <strong>Card-Layout für Einheiten und Dashboard</strong>
+                </div>
+                <p>
+                    Die Einheitentabelle und die „Letzte Einheiten"-Tabelle im Dashboard werden
+                    auf Mobile durch kompakte Karten ersetzt. Jede Karte zeigt Titel, Datum
+                    und die wichtigsten Kennzahlen auf einen Blick. Antippen öffnet direkt
+                    die Bearbeitungsseite. Auf Desktop bleibt die Tabellenansicht unverändert.
+                </p>
+                <div class="changelog-files">
+                    <span>Geändert:</span>
+                    <code>entries.php</code>
+                    <code>dashboard.php</code>
+                    <code>assets/css/training-modern.css</code>
+                </div>
+            </div>
+
+            <div class="changelog-fix">
+                <div class="changelog-fix-header">
+                    <span class="badge badge-blue">Feature</span>
+                    <strong>Strava-Import als Card-Liste</strong>
+                </div>
+                <p>
+                    Die Import-Tabelle in <code>strava_import.php</code> wird auf Mobile durch
+                    eine Card-Liste ersetzt: jede Aktivität zeigt Checkbox, Titel und Eckdaten
+                    in einer kompakten, gut tippbaren Karte.
+                </p>
+                <div class="changelog-files">
+                    <span>Geändert:</span>
+                    <code>strava_import.php</code>
+                </div>
+            </div>
+
+            <div class="changelog-fix">
+                <div class="changelog-fix-header">
+                    <span class="badge badge-blue">Feature</span>
+                    <strong>Einheit bearbeiten — mobil optimiert</strong>
+                </div>
+                <p>
+                    Das Bearbeitungsformular ist auf Mobile neu priorisiert: Notizen, RPE
+                    und Fitnessgefühl erscheinen zuerst — genau die Felder, die nach einem
+                    Strava-Import noch fehlen. RPE und Fitness werden als Schaltflächen-Reihe
+                    (1–10) dargestellt statt als Zahlenfeld. Die technischen Felder
+                    (Distanz, Dauer, Puls — meist von Strava befüllt) rutschen nach unten.
+                    Auf Desktop bleibt die Reihenfolge unverändert.
+                </p>
+                <div class="changelog-files">
+                    <span>Geändert:</span>
+                    <code>edit_entry.php</code>
+                    <code>assets/css/training-modern.css</code>
+                </div>
+            </div>
+
+        </div>
+    </div><!-- /.changelog-entry v1.2.0 -->
+
+    <!-- ═══════════════════════════════════════════════════════ -->
     <!-- Version 1.1.0 — Security Patch                        -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div class="changelog-entry" id="v1-1-0">

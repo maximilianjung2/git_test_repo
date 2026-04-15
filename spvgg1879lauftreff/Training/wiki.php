@@ -23,7 +23,7 @@ require __DIR__ . '/includes/header.php';
         <ul>
             <li><a href="#faq">Nutzer-FAQ</a></li>
             <li><a href="#technik">Technische Dokumentation</a></li>
-            <li><a href="#roadmap">Status und nächste Ideen</a></li>
+            <li><a href="#roadmap">Backlog &amp; Prioritäten</a></li>
             <li><a href="/training/changelog.php">Changelog →</a></li>
         </ul>
     </div>
@@ -154,14 +154,16 @@ require __DIR__ . '/includes/header.php';
             <li>Invite-basierte Registrierung neuer Nutzer</li>
             <li>Admin-Bereiche für Nutzerverwaltung und Invite-Verwaltung</li>
             <li>Strava-OAuth-Anbindung mit Import letzter Aktivitäten inkl. Pulsdaten</li>
+            <li>Progressive Web App (PWA): installierbar auf iOS und Android, Service Worker für Asset-Caching</li>
+            <li>Mobile UX: Bottom Navigation, Card-Layouts für Einheiten und Dashboard, mobil optimiertes Bearbeitungsformular</li>
         </ul>
 
         <h3>Wichtige Dateien und Bereiche</h3>
         <ul>
             <li><code>dashboard.php</code> – Übersichtsseite mit Kennzahlen, Verlaufsgrafik und letzten Einheiten</li>
-            <li><code>entries.php</code> – Liste der sichtbaren eigenen Einheiten inkl. Quick-Update</li>
+            <li><code>entries.php</code> – Liste der sichtbaren eigenen Einheiten inkl. Quick-Update (Desktop) und Card-View (Mobile)</li>
             <li><code>entry_form.php</code> – neue Einheit anlegen</li>
-            <li><code>edit_entry.php</code> – vollständige Bearbeitung einer Einheit</li>
+            <li><code>edit_entry.php</code> – vollständige Bearbeitung einer Einheit; auf Mobile priorisiert: Notizen, RPE, Fitness zuerst</li>
             <li><code>update_quick_entry.php</code> – schnelle Änderungen direkt in der Tabelle speichern</li>
             <li><code>delete_entry.php</code> – Eintrag löschen</li>
             <li><code>export_entries.php</code> – CSV-Export der Einheiten</li>
@@ -171,10 +173,14 @@ require __DIR__ . '/includes/header.php';
             <li><code>login.php</code> / <code>logout.php</code> – Anmeldung und Abmeldung</li>
             <li><code>strava_connect.php</code> – Start des OAuth-Flows zu Strava</li>
             <li><code>strava_callback.php</code> – Verarbeitung des OAuth-Callbacks und Speichern der Tokens</li>
-            <li><code>strava_import.php</code> – Laden und Importieren aktueller Strava-Aktivitäten</li>
+            <li><code>strava_import.php</code> – Laden und Importieren aktueller Strava-Aktivitäten; Card-View auf Mobile</li>
+            <li><code>manifest.json</code> – PWA-Manifest: App-Name, Icons, Startseite, Vollbild-Modus</li>
+            <li><code>sw.js</code> – Service Worker: Asset-Caching für schnellere Ladezeiten</li>
+            <li><code>assets/icons/</code> – App-Icons (192×192 und 512×512) für PWA und Home-Bildschirm</li>
+            <li><code>assets/css/training-modern.css</code> – Haupt-Stylesheet inkl. Mobile-UX (Bottom Nav, Cards, Rating-Buttons)</li>
             <li><code>includes/auth.php</code> – Login-Schutz, Session-Helfer und Admin-Prüfungen</li>
             <li><code>includes/db.php</code> – Datenbankverbindung</li>
-            <li><code>includes/header.php</code> / <code>includes/footer.php</code> – gemeinsames Layout und Navigation</li>
+            <li><code>includes/header.php</code> / <code>includes/footer.php</code> – gemeinsames Layout, Desktop-Nav und mobile Bottom-Nav inkl. Mehr-Overlay</li>
             <li><code>includes/entry_repository.php</code> – gemeinsame Ladefunktion für sichtbare Einheiten</li>
             <li><code>includes/strava_client.php</code> – Laden, Refresh und API-Zugriff für Strava</li>
         </ul>
@@ -283,7 +289,12 @@ require __DIR__ . '/includes/header.php';
     </div>
 
     <div class="wiki-section" id="roadmap">
-        <h2>Status und nächste Ideen</h2>
+        <h2>Backlog &amp; Prioritäten</h2>
+        <p>
+            Hier wird festgehalten, was bereits umgesetzt wurde, was als nächstes geplant ist und welche
+            technischen Themen noch offen sind. Die Liste wird laufend aktualisiert.
+            Abgeschlossene Änderungen sind im <a href="/training/changelog.php">Changelog</a> dokumentiert.
+        </p>
 
         <h3>Bereits umgesetzt</h3>
         <ul>
@@ -294,18 +305,94 @@ require __DIR__ . '/includes/header.php';
             <li>Invite-basierte Nutzeranlage</li>
             <li>Admin-Nutzerverwaltung</li>
             <li>Admin-Invite-Verwaltung</li>
-            <li>Strava-Import</li>
-            <li>Pulsdaten aus Strava importieren</li>
+            <li>Strava-Import inkl. Pulsdaten</li>
             <li>CSV-Export der Einheiten</li>
+            <li>Modernes Frontend mit Theme-Umschalter (Modern/Classic)</li>
+            <li>Einheiten-Tabelle mit konfigurierbaren Spalten, Drag-to-resize und Breiteneinstellung</li>
+            <li>Security Patch v1.1.0 (CSRF, DELETE via POST, Open Redirect, Host-Header, .env)</li>
+            <li>Progressive Web App (PWA): installierbar auf iOS und Android, Service Worker</li>
+            <li>Mobile UX v1.2.0: Bottom Navigation, Card-Layouts, optimiertes Bearbeitungsformular, Strava-Import als Cards</li>
         </ul>
 
-        <h3>Mögliche nächste Schritte</h3>
+        <h3>Priorität 1 — Nächste Schritte (hoher Nutzen)</h3>
+        <p>Diese Punkte haben den größten direkten Mehrwert für die tägliche Nutzung.</p>
         <ul>
-            <li>Filter und Suche für <code>Meine Einheiten</code></li>
-            <li>klarere Trennung zwischen Altpfaden und produktiven Admin-Pfaden</li>
-            <li>Absicherung technischer Hilfsskripte und Aufräumen veralteter Dateien</li>
-            <li>optionale Historie oder Soft-Delete-Verwaltung für ausgeblendete Einträge</li>
-            <li>schrittweise Ausbau der Projektdokumentation</li>
+            <li>
+                <strong>Notizen im Dashboard</strong> —
+                Notizen sind das Kernstück der Einheiten-Dokumentation, tauchen auf dem Dashboard
+                aber bisher nicht auf. Geplant ist ein Bereich der die zuletzt geschriebenen Notizen
+                direkt sichtbar macht.
+            </li>
+            <li>
+                <strong>Einheiten als Highlight markieren</strong> —
+                Wichtige Läufe (Wettkämpfe, Bestleistungen, besondere Einheiten) sollen mit einem
+                Flag oder Stern markiert werden können. In der Einheitenliste kann dann gezielt
+                nach Highlights gefiltert werden.
+            </li>
+            <li>
+                <strong>Filter und Suche in „Meine Einheiten"</strong> —
+                Mit wachsender Datenmenge wird die Tabelle ohne Filter schwer zu navigieren.
+                Geplant sind mindestens ein Zeitraumfilter und ein Filter nach Einheitstyp.
+            </li>
+        </ul>
+
+        <h3>Priorität 2 — Nächster Patch</h3>
+        <p>Sinnvolle Verbesserungen die etwas mehr Aufwand erfordern oder noch offen diskutiert werden.</p>
+        <ul>
+            <li>
+                <strong>RPE und Fitness — Eingabe überarbeiten</strong> —
+                Die aktuellen Schieberegler (Slider) funktionieren, sind aber in der Darstellung
+                unübersichtlich und in der Bedienung unnötig, da die Zahl sowieso manuell eingegeben wird.
+                Geplant ist eine schlankere Variante, z. B. ein einfaches Zahlenfeld oder eine
+                Schaltflächen-Reihe (1–10).
+            </li>
+            <li>
+                <strong>Serverseitige Eingabe-Validierung</strong> —
+                Felder wie <code>activity_date</code>, <code>sport_type</code> und Wertebereiche
+                (z. B. RPE 1–10) werden aktuell clientseitig geprüft, aber nicht konsequent serverseitig
+                validiert. Betrifft <code>entry_form.php</code> und <code>edit_entry.php</code>.
+            </li>
+            <li>
+                <strong>Strava Token Retry-Logik</strong> —
+                Wenn ein Strava-Zugriffstoken während eines laufenden Imports abläuft, schlägt der
+                Request fehl. Geplant ist eine automatische Retry-Logik nach erfolgreichem Token-Refresh.
+            </li>
+            <li>
+                <strong>Soft-Delete / Papierkorb</strong> —
+                Gelöschte Einheiten sind aktuell unwiderruflich weg. Ein Papierkorb oder eine
+                Ausblend-Funktion mit Wiederherstellungsoption würde versehentliche Löschungen abfangen.
+            </li>
+        </ul>
+
+        <h3>Priorität 3 — Technische Schuld (kein Zeitdruck)</h3>
+        <p>
+            Diese Punkte haben keinen direkten Nutzereinfluss, verbessern aber die Wartbarkeit
+            und Sauberkeit der Codebasis langfristig.
+        </p>
+        <ul>
+            <li>
+                <strong>Code-Duplikation bereinigen</strong> —
+                <code>create_invite.php</code> und <code>admin_invites.php</code> enthalten identische
+                Logik zur Invite-Erstellung. Mittelfristig sollte das in eine gemeinsame Funktion
+                ausgelagert und <code>create_invite.php</code> als Altpfad entfernt werden.
+            </li>
+            <li>
+                <strong>Inline-JavaScript auslagern</strong> —
+                Das JavaScript in <code>entries.php</code> (Spalten-Toggle, Drag-Resize, Breitensteuerung)
+                sollte in eine externe Datei <code>assets/js/entries.js</code> ausgelagert werden.
+                Macht den Code übersichtlicher und ermöglicht Browser-Caching.
+            </li>
+            <li>
+                <strong>Altpfade und Hilfsskripte aufräumen</strong> —
+                Dateien wie <code>create_user.php</code> oder ältere Setup-Skripte sollten geprüft
+                und wenn nicht mehr nötig entfernt oder explizit gesichert werden.
+            </li>
+            <li>
+                <strong>GROUP BY Kompatibilität in admin_users.php</strong> —
+                Die aktuelle Abfrage könnte auf MySQL-Instanzen mit striktem
+                <code>ONLY_FULL_GROUP_BY</code>-Modus Fehler werfen. Betrifft nur den Admin-Bereich
+                und ist aktuell wahrscheinlich kein aktives Problem.
+            </li>
         </ul>
 
         <h3>Leitgedanke</h3>

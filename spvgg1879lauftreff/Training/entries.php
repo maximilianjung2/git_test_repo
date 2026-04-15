@@ -72,7 +72,7 @@ require __DIR__ . '/includes/header.php';
             <button id="resetColBtn" style="margin-left:auto;background:none;border:none;color:#94a3b8;font-size:0.78rem;cursor:pointer;padding:2px 4px;" title="Einstellungen zurücksetzen">↺ Zurücksetzen</button>
         </div>
 
-        <div class="table-wrapper">
+        <div class="table-wrapper hide-on-mobile">
             <table id="entriesTable" class="resizable-table">
                 <colgroup>
                     <col data-col="datum"    style="width:92px">
@@ -163,6 +163,38 @@ require __DIR__ . '/includes/header.php';
                 </tbody>
             </table>
         </div>
+        <!-- Mobile Card View -->
+        <div class="mobile-card-list">
+            <?php foreach ($entries as $entry): ?>
+                <a class="entry-card" href="/training/edit_entry.php?id=<?= (int)$entry['id'] ?>">
+                    <div class="entry-card-header">
+                        <span class="entry-card-title"><?= htmlspecialchars($entry['title']) ?></span>
+                        <span class="entry-card-date"><?= htmlspecialchars($entry['activity_date']) ?></span>
+                    </div>
+                    <div class="entry-card-stats">
+                        <?php if ($entry['distance_km'] !== null): ?>
+                            <span class="entry-card-stat"><strong><?= htmlspecialchars(number_format((float)$entry['distance_km'], 2, ',', '.')) ?></strong> km</span>
+                        <?php endif; ?>
+                        <?php if ($entry['duration_min'] !== null): ?>
+                            <span class="entry-card-stat"><strong><?= htmlspecialchars((string)$entry['duration_min']) ?></strong> min</span>
+                        <?php endif; ?>
+                        <?php if ($entry['rpe'] !== null): ?>
+                            <span class="entry-card-stat">RPE <strong><?= (int)$entry['rpe'] ?></strong></span>
+                        <?php endif; ?>
+                        <?php if ($entry['fitness_feeling'] !== null): ?>
+                            <span class="entry-card-stat">Fitness <strong><?= (int)$entry['fitness_feeling'] ?></strong></span>
+                        <?php endif; ?>
+                        <?php if (!empty($entry['training_type'])): ?>
+                            <span class="badge badge-blue"><?= htmlspecialchars($entry['training_type']) ?></span>
+                        <?php endif; ?>
+                    </div>
+                    <?php if (!empty($entry['notes'])): ?>
+                        <div class="entry-card-notes"><?= htmlspecialchars($entry['notes']) ?></div>
+                    <?php endif; ?>
+                </a>
+            <?php endforeach; ?>
+        </div>
+
     <?php endif; ?>
 </div>
 
