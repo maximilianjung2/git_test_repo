@@ -35,6 +35,27 @@ function navClass(string $script, string $current): string {
         });
     }
 </script>
+<style>
+    /* Mobile-only Elemente: auf Desktop immer versteckt */
+    .bottom-nav,
+    .more-overlay-sheet,
+    .more-overlay-backdrop,
+    .mobile-card-list,
+    .strava-card-list,
+    .rating-buttons {
+        display: none !important;
+    }
+
+    /* Auf Mobile wieder einblenden — überschreibt die Regel oben */
+    @media (max-width: 640px) {
+        .bottom-nav              { display: flex !important; }
+        .more-overlay-sheet.open { display: block !important; }
+        .more-overlay-backdrop.open { display: block !important; }
+        .mobile-card-list        { display: flex !important; }
+        .strava-card-list        { display: flex !important; }
+        .rating-buttons          { display: flex !important; }
+    }
+</style>
 <body<?= $loggedIn ? '' : ' class="auth-body"' ?>>
 <?php if ($loggedIn): ?>
 <nav class="main-nav">

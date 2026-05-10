@@ -16,6 +16,219 @@ require __DIR__ . '/includes/header.php';
     </div>
 
     <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- Version 1.3.0 — Backend-Konsolidierung & Reliability  -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div class="changelog-entry" id="v1-3-0">
+        <div class="changelog-header">
+            <div class="changelog-meta">
+                <span class="changelog-version">v1.3.0</span>
+                <span class="changelog-date">10. Mai 2026</span>
+            </div>
+            <div class="changelog-badges">
+                <span class="badge badge-blue">Refactor</span>
+                <span class="badge badge-red">Security</span>
+            </div>
+        </div>
+
+        <h2 class="changelog-title">Backend-Konsolidierung, Caching &amp; Reliability</h2>
+        <p class="changelog-summary">
+            Der öffentliche Vereinsbereich und der Mitgliederbereich teilen sich jetzt
+            eine gemeinsame Strava-Client-Bibliothek und einen zentralen Konfigurations-
+            und Secret-Speicher. Damit ist beim nächsten API-Update oder Secret-Rotate
+            nur noch eine Stelle anzufassen statt vier. Außerdem: automatischer
+            Token-Backup, Admin-Mails bei Fehlern und ein Status-Dashboard für die
+            öffentliche Vereins-Anzeige. Funktionalität für Mitglieder bleibt
+            unverändert — alle Änderungen sind unter der Haube.
+        </p>
+
+        <div class="changelog-fixes">
+
+            <div class="changelog-fix">
+                <div class="changelog-fix-header">
+                    <span class="badge badge-blue">Refactor</span>
+                    <strong>Geteilter Strava-Client</strong>
+                </div>
+                <p>
+                    Token-Refresh, OAuth-Code-Exchange und API-GETs leben jetzt zentral
+                    in <code>includes/strava.php</code>. Der Mitglieder-Client
+                    (<code>strava_client.php</code>) wrappt diese Primitive und kümmert
+                    sich nur noch um die DB-spezifische Token-Persistenz pro Mitglied.
+                    Wenn Strava die API ändert oder ein Bug auftaucht, ist nur noch
+                    eine Datei betroffen statt zuvor vier.
+                </p>
+                <div class="changelog-files">
+                    <span>Neu:</span>
+                    <code>../includes/strava.php</code>
+                    <span style="margin-left:8px;">Geändert:</span>
+                    <code>includes/strava_client.php</code>
+                </div>
+            </div>
+
+            <div class="changelog-fix">
+                <div class="changelog-fix-header">
+                    <span class="badge badge-blue">Refactor</span>
+                    <strong>Zentrale <code>secrets.php</code> für beide Bereiche</strong>
+                </div>
+                <p>
+                    Strava-Credentials und DB-Zugang stehen jetzt in einer einzigen
+                    <code>secrets.php</code> im Web-Root, die von beiden Bereichen
+                    gemeinsam geladen wird. Die <code>.env</code> wird weiterhin für
+                    Training-spezifische Werte (Redirect-URI, App-URL) genutzt, dient
+                    aber nur noch als Fallback für die anderen Werte. Beim
+                    Secret-Rotieren reicht jetzt eine Stelle.
+                </p>
+                <div class="changelog-files">
+                    <span>Neu:</span>
+                    <code>../secrets.php</code>
+                    <span style="margin-left:8px;">Geändert:</span>
+                    <code>includes/config.php</code>
+                </div>
+            </div>
+
+            <div class="changelog-fix">
+                <div class="changelog-fix-header">
+                    <span class="badge badge-blue">Reliability</span>
+                    <strong>Caching der öffentlichen Kilometer-Anzeige</strong>
+                </div>
+                <p>
+                    Die Vereins-Kilometer-Anzeige cached die berechnete Summe für 10
+                    Minuten. Damit reduziert sich die Last auf der Strava-API deutlich
+                    (Rate-Limit: 100 Requests / 15 Min) und die öffentliche Anzeige lädt
+                    spürbar schneller. Bei API-Fehlern wird der zuletzt gecachte Wert
+                    zurückgegeben — die Anzeige bleibt also stabil, auch wenn Strava
+                    mal kurz nicht erreichbar ist.
+                </p>
+                <div class="changelog-files">
+                    <span>Geändert:</span>
+                    <code>../kilometer.php</code>
+                </div>
+            </div>
+
+            <div class="changelog-fix">
+                <div class="changelog-fix-header">
+                    <span class="badge badge-blue">Reliability</span>
+                    <strong>Automatisches Token-Backup</strong>
+                </div>
+                <p>
+                    Bei jedem erfolgreichen Token-Refresh wird die alte
+                    <code>strava_tokens.json</code> nach
+                    <code>strava_tokens.json.bak</code> kopiert, bevor sie überschrieben
+                    wird. Bei einer Störung lässt sich so die letzte funktionierende
+                    Version wiederherstellen, ohne sofort eine vollständige
+                    Re-Authorisierung zu brauchen. (Wirksam für die öffentliche
+                    Vereins-Anbindung; Mitglieder-Tokens liegen in der DB und sind
+                    über deren Backups gesichert.)
+                </p>
+                <div class="changelog-files">
+                    <span>Geändert:</span>
+                    <code>../includes/strava.php</code>
+                    <code>../callback.php</code>
+                    <code>../kilometer.php</code>
+                    <code>../kilometer_debug.php</code>
+                </div>
+            </div>
+
+            <div class="changelog-fix">
+                <div class="changelog-fix-header">
+                    <span class="badge badge-red">Security</span>
+                    <strong>CSRF-Schutz für die öffentliche OAuth-Anbindung</strong>
+                </div>
+                <p>
+                    Der Mitgliederbereich hatte seit v1.1.0 bereits State-Parameter-
+                    Validierung im OAuth-Flow. Die öffentliche Vereins-Anbindung war
+                    bisher nicht so abgesichert. Mit dem neuen
+                    <code>strava_connect.php</code> wird auch hier ein zufälliger
+                    State-Token gesetzt, in der Session abgelegt und beim Callback
+                    per <code>hash_equals</code> geprüft.
+                </p>
+                <div class="changelog-files">
+                    <span>Neu:</span>
+                    <code>../strava_connect.php</code>
+                    <span style="margin-left:8px;">Geändert:</span>
+                    <code>../callback.php</code>
+                </div>
+            </div>
+
+            <div class="changelog-fix">
+                <div class="changelog-fix-header">
+                    <span class="badge badge-red">Security</span>
+                    <strong>Public-Token-Refresh: POST statt GET</strong>
+                </div>
+                <p>
+                    Der Token-Refresh des öffentlichen Vereins-Kontos hatte den
+                    <code>client_secret</code> als URL-Parameter via GET an Strava
+                    geschickt — der Endpoint akzeptiert aber nur POST, und der
+                    Secret landete dabei zusätzlich in Server- und Browser-Logs.
+                    Ist jetzt gefixt: Token-Endpoint wird ausschließlich per POST
+                    aufgerufen, Credentials nur im Body.
+                </p>
+                <div class="changelog-files">
+                    <span>Geändert:</span>
+                    <code>../kilometer.php</code>
+                    <code>../kilometer_debug.php</code>
+                </div>
+            </div>
+
+            <div class="changelog-fix">
+                <div class="changelog-fix-header">
+                    <span class="badge badge-blue">Feature</span>
+                    <strong>Admin-Mails bei Token- und API-Fehlern</strong>
+                </div>
+                <p>
+                    Wenn der Token-Refresh oder ein Strava-API-Aufruf der öffentlichen
+                    Anzeige fehlschlägt, schickt das System automatisch eine kurze
+                    E-Mail an die in <code>secrets.php</code> hinterlegte Admin-Adresse.
+                    Pro Subject höchstens eine Mail pro Stunde — damit ein dauerhaft
+                    kaputter Token nicht in 144 Mails am Tag resultiert. Probleme
+                    werden so erkannt, bevor jemand die „0 km"-Anzeige meldet.
+                </p>
+                <div class="changelog-files">
+                    <span>Neu:</span>
+                    <code>../includes/notify.php</code>
+                </div>
+            </div>
+
+            <div class="changelog-fix">
+                <div class="changelog-fix-header">
+                    <span class="badge badge-blue">Feature</span>
+                    <strong>Status-Dashboard für die Vereins-Anzeige</strong>
+                </div>
+                <p>
+                    Das öffentliche Admin-Wiki hat oben jetzt drei Status-Karten —
+                    Strava-Token, letzter Sync, DB-Verbindung — mit grüner/gelber/roter
+                    Ampel. Damit ist auf einen Blick erkennbar, ob die Vereins-
+                    Kilometer-Anzeige läuft oder hakt, ohne durch Logs wühlen zu müssen.
+                </p>
+                <div class="changelog-files">
+                    <span>Neu:</span>
+                    <code>../includes/health.php</code>
+                    <span style="margin-left:8px;">Geändert:</span>
+                    <code>../wiki.php</code>
+                </div>
+            </div>
+
+            <div class="changelog-fix">
+                <div class="changelog-fix-header">
+                    <span class="badge badge-blue">Feature</span>
+                    <strong>Mitgliederbereich von der Vereins-Startseite verlinkt</strong>
+                </div>
+                <p>
+                    Die öffentliche <code>index.html</code> hat jetzt einen deutlich
+                    sichtbaren Button „Mitgliederbereich" in Strava-Orange, der direkt
+                    zu <code>/training/</code> verlinkt. Mitglieder finden den Weg
+                    in den geschützten Bereich vom üblichen Vereins-Einstieg aus,
+                    ohne sich die URL zu merken.
+                </p>
+                <div class="changelog-files">
+                    <span>Geändert:</span>
+                    <code>../index.html</code>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
     <!-- Version 1.2.0 — Mobile UX & PWA                       -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div class="changelog-entry" id="v1-2-0">

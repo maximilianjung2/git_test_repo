@@ -1,7 +1,10 @@
 <?php
-$client_id = '163827';
-$client_secret = '21c8af73247d8876684acf4e36ec1fa1d38c9a67';
-$tokenFile = __DIR__ . '/strava_tokens.json';
+require __DIR__ . '/includes/strava.php';
+require __DIR__ . '/includes/notify.php';
+$secrets = require __DIR__ . '/secrets.php';
+$client_id     = $secrets['strava']['client_id'];
+$client_secret = $secrets['strava']['client_secret'];
+$tokenFile     = __DIR__ . '/strava_tokens.json';
 
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
@@ -12,29 +15,33 @@ echo "<pre>🔄 Starte Strava-Sync...\n";
 if (!file_exists($tokenFile)) {
     die("❌ Token-Datei nicht gefunden.\n");
 }
-$tokens = json_decode(file_get_contents($tokenFile), true);
+$raw = file_get_contents($tokenFile);
+$tokens = json_decode($raw, true);
+if (!is_array($tokens) || empty($tokens['refresh_token'])) {
+    die("❌ Token-Datei ist leer oder ungültig. Bitte über strava_connect.php neu autorisieren.\n");
+}
 echo "🔑 Tokens geladen.\n";
 
 // Token ggf. erneuern
-if (time() >= $tokens['expires_at']) {
+if (strava_token_needs_refresh($tokens)) {
     echo "🔄 Token abgelaufen, hole neuen...\n";
 
-    $refresh_url = "https://www.strava.com/oauth/token?" . http_build_query([
-        'client_id' => $client_id,
-        'client_secret' => $client_secret,
-        'grant_type' => 'refresh_token',
-        'refresh_token' => $tokens['refresh_token']
-    ]);
-
-    $newResponse = file_get_contents($refresh_url);
-    if ($newResponse === false) {
-        die("❌ Fehler beim Token-Refresh.\n");
+    $refresh = strava_refresh_tokens($client_id, $client_secret, $tokens['refresh_token']);
+    if (!$refresh['ok']) {
+        notify_admin(
+            'Strava Token-Refresh fehlgeschlagen (Debug-Sync)',
+            "Im manuell gestarteten Debug-Sync ist der Refresh fehlgeschlagen.\n"
+            . "HTTP-Code: {$refresh['http_code']}\n"
+            . "Fehler:    {$refresh['error']}"
+        );
+        die("❌ Token-Refresh fehlgeschlagen (HTTP {$refresh['http_code']}): {$refresh['error']}\n");
     }
 
-    $newTokens = json_decode($newResponse, true);
-    file_put_contents($tokenFile, json_encode($newTokens));
-    $tokens = $newTokens;
-    echo "✅ Token aktualisiert.\n";
+    if (!strava_save_tokens_with_backup($tokenFile, $refresh['data'])) {
+        die("❌ Token-Datei konnte nicht geschrieben werden: $tokenFile\n");
+    }
+    $tokens = $refresh['data'];
+    echo "✅ Token aktualisiert (Backup unter {$tokenFile}.bak).\n";
 } else {
     echo "✅ Access Token ist gültig.\n";
 }
@@ -47,27 +54,16 @@ $allActivities = [];
 
 do {
     $url = "https://www.strava.com/api/v3/athlete/activities?" . http_build_query([
-        'after' => $yearAgo,
+        'after'    => $yearAgo,
         'per_page' => 200,
-        'page' => $page
+        'page'     => $page,
     ]);
 
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        'Authorization: Bearer ' . $tokens['access_token']
-    ]);
-
-    $response = curl_exec($ch);
-    if ($response === false) {
-        die("❌ Fehler bei API-Anfrage (Seite $page): " . curl_error($ch) . "\n");
+    $result = strava_api_get($tokens['access_token'], $url);
+    if (!$result['ok']) {
+        die("❌ Fehler bei API-Anfrage (Seite $page, HTTP {$result['http_code']}): {$result['error']}\n");
     }
-    curl_close($ch);
-
-    $activities = json_decode($response, true);
-    if (!is_array($activities)) {
-        die("❌ Ungültige Antwort (Seite $page):\n$response\n");
-    }
+    $activities = $result['data'];
 
     $allActivities = array_merge($allActivities, $activities);
     echo "📄 Seite $page: " . count($activities) . " Aktivitäten geladen.\n";
@@ -77,7 +73,11 @@ do {
 // Verbindung zur Datenbank
 echo "🛠️ Verbinde mit Datenbank...\n";
 try {
-    $db = new PDO('mysql:host=database-5018019376.webspace-host.com;dbname=dbs14323265', 'dbu302398', 'lauftreffhomepage');
+    $db = new PDO(
+        "mysql:host={$secrets['db']['host']};dbname={$secrets['db']['name']};charset={$secrets['db']['charset']}",
+        $secrets['db']['user'],
+        $secrets['db']['pass']
+    );
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     echo "✅ Verbindung erfolgreich.\n";
 } catch (PDOException $e) {

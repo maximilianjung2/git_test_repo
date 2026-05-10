@@ -2,7 +2,12 @@
 header('Content-Type: application/json');
 
 try {
-    $db = new PDO('mysql:host=database-5018019376.webspace-host.com;dbname=dbs14323265', 'dbu302398', 'lauftreffhomepage');
+    $secrets = require __DIR__ . '/secrets.php';
+    $db = new PDO(
+        "mysql:host={$secrets['db']['host']};dbname={$secrets['db']['name']};charset={$secrets['db']['charset']}",
+        $secrets['db']['user'],
+        $secrets['db']['pass']
+    );
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     // Nur Aktivitäten vom Typ 'Run' mit Name 'Spvgg. Hainstadt' (optional)

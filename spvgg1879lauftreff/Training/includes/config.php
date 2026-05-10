@@ -1,7 +1,17 @@
 <?php
 
-// Lädt Schlüssel=Wert-Paare aus der .env-Datei in die Umgebung.
-// Muss vor dem ersten Zugriff auf $_ENV / getenv() aufgerufen werden.
+// Lädt zuerst die zentrale secrets.php (Strava-Credentials + DB), dann
+// optional die .env-Datei für Training-spezifische Werte (redirect_uri,
+// app_url). secrets.php ist die kanonische Quelle für Geheimnisse;
+// .env wird nur noch für Konfiguration benutzt, die ausschließlich
+// den /training/-Bereich betrifft.
+
+$secrets = (static function (): array {
+    $file = __DIR__ . '/../../secrets.php';
+    return is_readable($file) ? require $file : [];
+})();
+
+// .env-Loader (Fallback für Werte, die nicht in secrets.php stehen).
 (static function (): void {
     $file = __DIR__ . '/../.env';
     if (!is_readable($file)) {
@@ -22,11 +32,11 @@
 
 return [
     'db' => [
-        'host'    => $_ENV['DB_HOST']    ?? '',
-        'name'    => $_ENV['DB_NAME']    ?? '',
-        'user'    => $_ENV['DB_USER']    ?? '',
-        'pass'    => $_ENV['DB_PASS']    ?? '',
-        'charset' => 'utf8mb4',
+        'host'    => $secrets['db']['host']    ?? $_ENV['DB_HOST'] ?? '',
+        'name'    => $secrets['db']['name']    ?? $_ENV['DB_NAME'] ?? '',
+        'user'    => $secrets['db']['user']    ?? $_ENV['DB_USER'] ?? '',
+        'pass'    => $secrets['db']['pass']    ?? $_ENV['DB_PASS'] ?? '',
+        'charset' => $secrets['db']['charset'] ?? 'utf8mb4',
     ],
     'app' => [
         'base_url'     => '/training',
@@ -34,8 +44,8 @@ return [
         'session_name' => 'lauftreff_training',
     ],
     'strava' => [
-        'client_id'     => $_ENV['STRAVA_CLIENT_ID']     ?? '',
-        'client_secret' => $_ENV['STRAVA_CLIENT_SECRET'] ?? '',
-        'redirect_uri'  => $_ENV['STRAVA_REDIRECT_URI']  ?? '',
+        'client_id'     => $secrets['strava']['client_id']     ?? $_ENV['STRAVA_CLIENT_ID']     ?? '',
+        'client_secret' => $secrets['strava']['client_secret'] ?? $_ENV['STRAVA_CLIENT_SECRET'] ?? '',
+        'redirect_uri'  => $_ENV['STRAVA_REDIRECT_URI'] ?? '',
     ],
 ];

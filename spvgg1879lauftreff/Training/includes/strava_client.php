@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/auth.php';
+require_once __DIR__ . '/../../includes/strava.php';
 
 function getStravaConfig(): array
 {
@@ -68,50 +69,34 @@ function refreshStravaTokenIfNeeded(PDO $pdo, int $userId): ?array
         return null;
     }
 
-    if (time() < ((int)$connection['expires_at'] - 60)) {
+    // 60s Buffer: nicht erst bei Ablauf refreshen, sondern kurz davor.
+    if (!strava_token_needs_refresh(['expires_at' => (int)$connection['expires_at']], 60)) {
         return $connection;
     }
 
     $strava = getStravaConfig();
 
-    $ch = curl_init('https://www.strava.com/oauth/token');
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query([
-        'client_id' => $strava['client_id'],
-        'client_secret' => $strava['client_secret'],
-        'grant_type' => 'refresh_token',
-        'refresh_token' => $connection['refresh_token'],
-    ]));
+    $result = strava_refresh_tokens(
+        (string)$strava['client_id'],
+        (string)$strava['client_secret'],
+        (string)$connection['refresh_token']
+    );
 
-    $response = curl_exec($ch);
-
-    if ($response === false) {
-        $error = curl_error($ch);
-        curl_close($ch);
-        throw new RuntimeException('Fehler beim Strava-Token-Refresh: ' . $error);
-    }
-
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-
-    $data = json_decode($response, true);
-
-    if (
-        $httpCode !== 200 ||
-        !is_array($data) ||
-        empty($data['access_token']) ||
-        empty($data['refresh_token']) ||
-        empty($data['expires_at'])
-    ) {
-        if (in_array($httpCode, [400, 401], true)) {
+    if (!$result['ok']) {
+        // 400/401 = Refresh-Token irreparabel ungültig → Verknüpfung löschen,
+        // damit das Mitglied beim nächsten Aufruf zur Re-Autorisierung
+        // weitergeleitet wird.
+        if (in_array($result['http_code'], [400, 401], true)) {
             deleteStravaConnection($pdo, $userId);
         }
-
-        throw new RuntimeException('Ungültige Antwort beim Strava-Token-Refresh: ' . $response);
+        throw new RuntimeException('Strava-Token-Refresh fehlgeschlagen: ' . $result['error']);
     }
 
-    saveStravaConnection($pdo, $userId, $data);
+    if (empty($result['data']['expires_at'])) {
+        throw new RuntimeException('Strava-Antwort ohne expires_at.');
+    }
+
+    saveStravaConnection($pdo, $userId, $result['data']);
 
     return getStravaConnection($pdo, $userId);
 }
@@ -124,30 +109,14 @@ function stravaApiGet(string $endpoint, string $accessToken, array $query = [], 
         $url .= '?' . http_build_query($query);
     }
 
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        'Authorization: Bearer ' . $accessToken,
-    ]);
+    $result = strava_api_get($accessToken, $url);
+    $httpCode = $result['http_code'];
 
-    $response = curl_exec($ch);
-
-    if ($response === false) {
-        $error = curl_error($ch);
-        curl_close($ch);
-        throw new RuntimeException('Fehler bei Strava-API-Anfrage: ' . $error);
+    if (!$result['ok']) {
+        throw new RuntimeException('Strava-API-Anfrage fehlgeschlagen: ' . $result['error']);
     }
 
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-
-    $data = json_decode($response, true);
-
-    if ($httpCode !== 200 || !is_array($data)) {
-        throw new RuntimeException('Ungültige Antwort von der Strava-API: ' . $response);
-    }
-
-    return $data;
+    return $result['data'];
 }
 
 function getRecentStravaRuns(PDO $pdo, int $userId, int $limit = 30): array

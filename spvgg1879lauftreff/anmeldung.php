@@ -1,11 +1,12 @@
 <?php
-// Datenbank-Verbindungsdaten anpassen:
-$servername = "database-5018019376.webspace-host.com";
-$username = "dbu302398";
-$password = "lauftreffhomepage";
-$dbname = "dbs14323265";
-// Verbindung zur Datenbank herstellen
-$conn = new mysqli($servername, $username, $password, $dbname);
+// Verbindungsdaten zentral aus secrets.php
+$secrets = require __DIR__ . '/secrets.php';
+$conn = new mysqli(
+    $secrets['db']['host'],
+    $secrets['db']['user'],
+    $secrets['db']['pass'],
+    $secrets['db']['name']
+);
 
 // Verbindung prüfen
 if ($conn->connect_error) {

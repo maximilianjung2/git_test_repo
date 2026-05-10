@@ -1,0 +1,54 @@
+# Schutz für interne Admin-Seiten der öffentlichen Welt.
+# Funktioniert mit Apache 2.2 UND 2.4.
+
+<FilesMatch "^(wiki|kilometer_debug|strava_connect)\.php$">
+    AuthType Basic
+    AuthName "Interner Bereich - Lauftreff"
+    # Pfad ggf. an Hoster anpassen (siehe Wiki, Abschnitt 9):
+    AuthUserFile /home/www/spvgg1879-lauftreff/htdocs/.htpasswd
+    Require valid-user
+</FilesMatch>
+
+# Token-Dateien niemals direkt ausliefern.
+<FilesMatch "^strava_tokens\.json(\.bak)?$">
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+</FilesMatch>
+
+# secrets.php niemals direkt ausliefern (nur per require einbinden).
+<Files "secrets.php">
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+</Files>
+
+# .htpasswd niemals ausliefern.
+<Files ".htpasswd">
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+</Files>
+
+# .htaccess selbst auch nicht.
+<Files ".htaccess">
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+</Files>
