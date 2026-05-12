@@ -1,0 +1,434 @@
+/* ============================================================
+   public.css
+   Layout-Komponenten für die öffentliche Vereinsseite.
+   Lädt nach lauftreff-base.css und verwendet deren Tokens.
+   ============================================================ */
+
+/* === Top-Bar === */
+.public-topbar {
+    background: var(--blue-dark);
+    color: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.2);
+}
+
+.public-topbar-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    max-width: 960px;
+    margin: 0 auto;
+    padding: var(--space-3) var(--space-4);
+}
+
+.public-brand {
+    color: #fff;
+    font-weight: 700;
+    font-size: 1rem;
+    text-decoration: none;
+    letter-spacing: 0.02em;
+}
+.public-brand:hover { color: #fff; opacity: 0.85; }
+
+.public-topbar .btn-accent {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+/* === Page-Layout === */
+.public-page {
+    padding: var(--space-5) 0 var(--space-7);
+}
+@media (min-width: 640px) {
+    .public-page { padding: var(--space-6) 0 var(--space-8); }
+}
+
+.page-header {
+    margin-bottom: var(--space-5);
+}
+.page-header h1 {
+    margin: 0 0 var(--space-2);
+}
+.page-header p {
+    margin: 0;
+    color: var(--muted);
+}
+
+/* === Hero (Startseite) === */
+.hero {
+    text-align: center;
+    margin-bottom: var(--space-6);
+}
+.hero-image {
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto var(--space-5);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+}
+.hero h1 {
+    font-size: 1.65rem;
+    margin: 0 0 var(--space-3);
+}
+.hero p {
+    color: var(--muted);
+    max-width: 520px;
+    margin: 0 auto;
+}
+@media (min-width: 640px) {
+    .hero h1 { font-size: 2rem; }
+}
+
+/* === Hero kompakt (Startseite mit km-Counter als Star) === */
+.hero-compact {
+    text-align: center;
+    margin-bottom: var(--space-5);
+}
+.hero-image-small {
+    width: 100%;
+    max-width: 220px;
+    margin: 0 auto var(--space-4);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+.hero-compact h1 {
+    font-size: 1.4rem;
+    margin: 0 0 var(--space-2);
+}
+.hero-tagline {
+    color: var(--muted);
+    margin: 0;
+    font-size: 0.95rem;
+}
+@media (min-width: 640px) {
+    .hero-image-small { max-width: 260px; }
+    .hero-compact h1 { font-size: 1.65rem; }
+}
+
+/* === Km-Counter (Star der Startseite) === */
+.km-block {
+    text-align: center;
+    margin: var(--space-6) auto var(--space-6);
+    min-height: 140px; /* verhindert Layout-Shift beim Laden */
+}
+.km-counter {
+    font-size: 4rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--blue);
+    letter-spacing: -0.025em;
+    font-variant-numeric: tabular-nums;
+    transition: opacity 0.4s ease;
+}
+.km-counter::after {
+    content: ' km';
+    font-size: 0.4em;
+    font-weight: 600;
+    color: var(--muted);
+    margin-left: 0.08em;
+    letter-spacing: 0;
+}
+.km-label {
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin-top: var(--space-3);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 500;
+}
+@media (min-width: 640px) {
+    .km-counter { font-size: 5.5rem; }
+    .km-block { margin: var(--space-7) auto; }
+}
+@media (min-width: 960px) {
+    .km-counter { font-size: 6.5rem; }
+}
+
+/* === Termin-Karte (nächster Lauftreff) === */
+.termin-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: var(--space-5);
+    margin: 0 auto var(--space-6);
+    max-width: 540px;
+    border-top: 4px solid var(--blue);
+}
+.termin-overline {
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    margin-bottom: var(--space-2);
+}
+.termin-datum {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--blue);
+    margin: 0 0 var(--space-1);
+}
+.termin-titel {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0 0 var(--space-3);
+}
+.termin-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    font-size: 0.9rem;
+    color: var(--muted);
+    margin-bottom: var(--space-3);
+}
+.termin-meta-item::before {
+    content: '📍 ';
+}
+.termin-beschreibung {
+    font-size: 0.95rem;
+    color: var(--text);
+    margin: 0 0 var(--space-4);
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+.termin-actions {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+}
+
+/* RSVP-Formular (Inline) */
+.rsvp-form {
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border);
+}
+.rsvp-form label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: var(--space-1);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+.rsvp-form input[type="text"],
+.rsvp-form input[type="email"] {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 0.95rem;
+    background: #fff;
+    margin-bottom: var(--space-3);
+    box-sizing: border-box;
+}
+.rsvp-form input:focus {
+    outline: 2px solid var(--blue);
+    outline-offset: -1px;
+    border-color: var(--blue);
+}
+.rsvp-form .honeypot {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+.rsvp-form .actions {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+}
+.rsvp-message {
+    padding: var(--space-3);
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    margin-bottom: var(--space-3);
+}
+.rsvp-message.error {
+    background: #fef2f2;
+    color: #991b1b;
+    border-left: 3px solid var(--red);
+}
+.rsvp-success {
+    text-align: center;
+    padding: var(--space-3);
+}
+.rsvp-success .check {
+    font-size: 2.5rem;
+    color: #16a34a;
+    line-height: 1;
+    margin-bottom: var(--space-2);
+}
+.rsvp-success h3 {
+    margin: 0 0 var(--space-2);
+    color: var(--text);
+}
+
+/* === CTA-Row (zwei Hauptaktionen) === */
+.cta-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+    max-width: 480px;
+    margin: 0 auto;
+}
+@media (min-width: 480px) {
+    .cta-row { grid-template-columns: 1fr 1fr; }
+}
+
+/* === Link-Grid (Buttons auf der Startseite, falls noch genutzt) === */
+.link-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+    max-width: 480px;
+    margin: 0 auto;
+}
+@media (min-width: 480px) {
+    .link-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* === Mini-Links im Footer (Instagram, Verein, Kontakt) === */
+.minilinks {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin-bottom: var(--space-3);
+}
+.minilinks a {
+    color: var(--muted);
+    text-decoration: none;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    transition: color 0.15s ease, background 0.15s ease;
+}
+.minilinks a:hover {
+    color: var(--blue);
+    background: var(--border-soft);
+}
+.minilinks span {
+    color: var(--border);
+    user-select: none;
+}
+
+/* === View-Switch (Wechsel zwischen Tabelle und Grafik) === */
+.view-switch {
+    display: inline-block;
+    margin-top: var(--space-2);
+    color: var(--blue);
+    font-size: 0.88rem;
+    font-weight: 500;
+    text-decoration: none;
+}
+.view-switch:hover {
+    color: var(--blue-dark);
+    text-decoration: underline;
+}
+
+/* === Tabelle (responsive) === */
+.public-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: var(--space-3);
+}
+.public-table th,
+.public-table td {
+    text-align: left;
+    padding: var(--space-3);
+    border-bottom: 1px solid var(--border);
+}
+.public-table th {
+    background: var(--border-soft);
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+}
+.public-table tbody tr:hover {
+    background: var(--border-soft);
+}
+
+/* Mobile: Tabelle in Cards umwandeln (data-label-Attribute auf td) */
+@media (max-width: 640px) {
+    .public-table thead { display: none; }
+    .public-table, .public-table tbody, .public-table tr, .public-table td {
+        display: block; width: 100%;
+    }
+    .public-table tr {
+        background: var(--card);
+        border-radius: var(--radius-sm);
+        box-shadow: var(--shadow-sm);
+        margin-bottom: var(--space-3);
+        padding: var(--space-3);
+    }
+    .public-table td {
+        border: none;
+        padding: var(--space-1) 0;
+        display: flex;
+        justify-content: space-between;
+        gap: var(--space-3);
+    }
+    .public-table td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: var(--muted);
+        font-size: 0.85rem;
+    }
+}
+
+/* === Bild-Galerie === */
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+}
+@media (min-width: 640px) {
+    .gallery-grid { grid-template-columns: repeat(3, 1fr); gap: var(--space-4); }
+}
+@media (min-width: 960px) {
+    .gallery-grid { grid-template-columns: repeat(4, 1fr); }
+}
+.gallery-grid img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s ease;
+}
+.gallery-grid a:hover img {
+    transform: scale(1.03);
+    box-shadow: var(--shadow);
+}
+
+/* === Chart-Wrapper === */
+.chart-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    min-height: 280px;
+}
+@media (min-width: 960px) {
+    .chart-wrapper { aspect-ratio: 21 / 9; }
+}
+
+/* === Footer === */
+.public-footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+    padding: var(--space-5) var(--space-4) var(--space-6);
+}
+.public-footer a { color: var(--muted); text-decoration: underline; }
+.public-footer a:hover { color: var(--blue); }

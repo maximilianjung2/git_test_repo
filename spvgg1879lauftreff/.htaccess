@@ -1,7 +1,7 @@
 # Schutz für interne Admin-Seiten der öffentlichen Welt.
 # Funktioniert mit Apache 2.2 UND 2.4.
 
-<FilesMatch "^(wiki|kilometer_debug|strava_connect)\.php$">
+<FilesMatch "^(wiki|kilometer_debug|strava_connect|notify_test|termin_edit)\.php$">
     AuthType Basic
     AuthName "Interner Bereich - Lauftreff"
     # Pfad ggf. an Hoster anpassen (siehe Wiki, Abschnitt 9):

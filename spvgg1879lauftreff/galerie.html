@@ -1,92 +1,52 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Fotogalerie</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #f0f2f5;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .container {
-      text-align: center;
-      padding: 20px;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      max-width: 1000px;
-      width: 95%;
-    }
-
-    .gallery {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  flex-wrap: wrap;
-  margin-top: 20px;
-}
-
-.gallery img {
-  width: 150px;
-  height: auto;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
-}
-
-    .gallery img:hover {
-      transform: scale(1.05);
-    }
-
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 10px;
-    }
-
-    p {
-      font-size: 1.1rem;
-      color: #555;
-    }
-
-    .button {
-      margin-top: 20px;
-      display: inline-block;
-      padding: 10px 20px;
-      background-color: #191fcb;
-      color: white;
-      text-decoration: none;
-      border-radius: 8px;
-      font-weight: bold;
-      font-size: 0.7rem;
-    }
-
-    .button:hover {
-      background-color: #e60707;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#1e3a8a">
+    <title>Fotogalerie – Spvgg. Hainstadt Lauftreff</title>
+    <link rel="stylesheet" href="/assets/css/lauftreff-base.css">
+    <link rel="stylesheet" href="/assets/css/public.css">
 </head>
 <body>
-  <div class="container">
-    <h1>Unsere Fotogalerie</h1>
-    <p>Ein paar Eindrücke aus dem Lauftreff:</p>
 
-    <div class="gallery">
-      <img src="/Images/Flyer Frühling.png" alt="Flyer">
-      <img src="/Images/Lauftreff_shirt_max.jpeg" alt="Wasserlauf Seligenstadt 2025">
-      <img src="/Images/Winter.jpeg" alt="Winter 2024">
-      
-
-      <!-- Du kannst beliebig viele Bilder hinzufügen -->
+<header class="public-topbar">
+    <div class="public-topbar-inner">
+        <a href="/" class="public-brand">Spvgg. Hainstadt Lauftreff</a>
+        <a href="/training/" class="btn btn-accent btn-sm">Mitgliederbereich →</a>
     </div>
+</header>
 
-    <a class="button" href="index.html">Zurück</a>
-  </div>
+<main class="public-page">
+    <div class="container">
+
+        <div class="page-header">
+            <h1>Fotogalerie</h1>
+            <p>Ein paar Eindrücke aus dem Lauftreff.</p>
+        </div>
+
+        <div class="gallery-grid">
+            <a href="/Images/Flyer Frühling.png" target="_blank">
+                <img src="/Images/Flyer Frühling.png" alt="Flyer Frühling">
+            </a>
+            <a href="/Images/Lauftreff_shirt_max.jpeg" target="_blank">
+                <img src="/Images/Lauftreff_shirt_max.jpeg" alt="Lauftreff-Shirt">
+            </a>
+            <a href="/Images/Winter.jpeg" target="_blank">
+                <img src="/Images/Winter.jpeg" alt="Winter 2024">
+            </a>
+        </div>
+
+        <p style="margin-top: var(--space-5);">
+            <a href="/" class="btn btn-ghost">← Zur Übersicht</a>
+        </p>
+
+    </div>
+</main>
+
+<footer class="public-footer">
+    <p>&copy; Spvgg. 1879 Hainstadt — Lauftreff</p>
+</footer>
+
 </body>
 </html>

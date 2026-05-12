@@ -232,6 +232,8 @@ $overallText = [
     <li><a href="#cache">10. Caching von <code>kilometer.php</code></a></li>
     <li><a href="#backup">11. Token-Backup &amp; Recovery</a></li>
     <li><a href="#notify">12. Fehler-Benachrichtigungen per E-Mail</a></li>
+    <li><a href="#termine">13. Lauftreff-Termine &amp; RSVPs</a></li>
+    <li><a href="#tools">14. Admin-Werkzeuge</a></li>
   </ul>
 </div>
 
@@ -327,6 +329,52 @@ $overallText = [
     <td>Automatisch erzeugte Sicherheitskopie der vorherigen
         <code>strava_tokens.json</code>. Wird bei jedem Refresh / Re-Auth
         überschrieben (siehe <a href="#backup">Abschnitt 11</a>).</td>
+  </tr>
+  <tr>
+    <td><code>naechster_lauf.json</code></td>
+    <td>JSON-Liste aller anstehenden Lauftreff-Termine. Wird vom Admin
+        per <code>termin_edit.php</code> gepflegt und von der Homepage
+        ausgelesen (siehe <a href="#termine">Abschnitt 13</a>).</td>
+  </tr>
+  <tr>
+    <td><code>naechster_lauf.php</code></td>
+    <td>JSON-Endpoint, der den zeitlich nächsten Termin aus
+        <code>naechster_lauf.json</code> zurückliefert (gefiltert auf
+        zukünftige Termine mit 1h Karenz nach Beginn).</td>
+  </tr>
+  <tr>
+    <td><code>rsvp.php</code></td>
+    <td>POST-Endpoint für Anmeldungen. Validiert Name + optionale Mail,
+        Rate-Limit pro IP+Termin, schickt Mail an Admin via
+        <code>notify_admin</code>. Keine DB-Speicherung.</td>
+  </tr>
+  <tr>
+    <td><code>termin_edit.php</code></td>
+    <td>Admin-Formular für die Pflege der Termine (Liste + Add / Edit /
+        Delete). Hinter Basic-Auth.</td>
+  </tr>
+  <tr>
+    <td><code>includes/termine.php</code></td>
+    <td>Geteilte Helper-Library mit
+        <code>termine_laden / speichern / naechster / finden</code>.
+        Macht automatische Migration vom alten Single-Object-Format
+        zur Array-Liste.</td>
+  </tr>
+  <tr>
+    <td><code>notify_test.php</code></td>
+    <td>Admin-Endpoint zum Verifizieren des Mail-Versands. Bei jedem
+        Aufruf wird eine Test-Mail an die Admin-Adresse verschickt
+        (Throttle deaktiviert). Hinter Basic-Auth.</td>
+  </tr>
+  <tr>
+    <td><code>assets/css/lauftreff-base.css</code></td>
+    <td>Geteilte Design-Tokens (Farben, Spacing, Buttons, Cards) für
+        alle öffentlichen Seiten. Mobile-first.</td>
+  </tr>
+  <tr>
+    <td><code>assets/css/public.css</code></td>
+    <td>Layout-Komponenten für die öffentliche Seite (Top-Bar, Hero,
+        km-Counter, Termin-Karte, responsive Tabelle, Galerie-Grid).</td>
   </tr>
   <tr>
     <td><code>chart.html</code>, <code>aktivitäten.html</code>,
@@ -748,6 +796,130 @@ $overallText = [
   In <code>secrets.php</code> einfach <code>admin_email</code> auf einen
   leeren String setzen (<code>''</code>). Die Notify-Funktion ist dann
   no-op und schreibt auch keine Marker-Dateien.
+</p>
+
+<h2 id="termine">13. Lauftreff-Termine &amp; RSVPs</h2>
+<p>
+  Die Startseite zeigt zwischen Kilometer-Counter und CTAs eine
+  Termin-Karte mit dem nächsten geplanten Lauftreff plus „Ich komme
+  vorbei"-Button. Du pflegst die Termine in einem einfachen
+  Admin-Formular, ohne DB.
+</p>
+
+<h3>Termin anlegen / bearbeiten</h3>
+<ol>
+  <li><a href="/termin_edit.php">termin_edit.php</a> aufrufen
+      (Basic-Auth-Login).</li>
+  <li>Oben siehst du alle bereits gepflegten Termine, sortiert nach
+      Datum. Vergangene werden blass markiert.</li>
+  <li>„Bearbeiten" lädt einen Termin in das Formular unten; das
+      Speichern aktualisiert ihn. Ohne Vorauswahl legst du einen neuen
+      Termin an.</li>
+  <li>„Löschen" entfernt einen Termin aus der Liste (Bestätigung
+      nötig).</li>
+</ol>
+
+<div class="note">
+  <strong>Auf der Homepage wird immer nur der zeitlich nächste Termin
+  angezeigt.</strong> Du kannst aber beliebig viele im Voraus pflegen
+  (z. B. ganzen Monat). Wenn der erste vorbei ist, rückt 1h nach Beginn
+  automatisch der nächste in der Liste nach.
+</div>
+
+<h3>Wo wird gespeichert?</h3>
+<p>
+  Alle Termine liegen in <code>naechster_lauf.json</code> im Web-Root.
+  Das ist eine einfache Liste — kein DB-Eintrag. Du kannst die Datei
+  zur Not auch per FTP direkt bearbeiten, aber der Editor ist
+  bequemer und validiert deine Eingaben.
+</p>
+<p>
+  Jeder Termin bekommt beim Anlegen automatisch eine stabile ID, damit
+  RSVPs ihn eindeutig referenzieren können — selbst wenn du den Titel
+  oder das Datum später änderst.
+</p>
+
+<h3>Wie funktioniert die Anmeldung?</h3>
+<p>
+  Klick auf „Ich komme vorbei" öffnet ein kleines Inline-Formular auf
+  der Homepage (Name + optionale E-Mail). Beim Absenden landet eine
+  Mail in deinem Postfach mit Subject
+  <code>[Lauftreff] Anmeldung: &lt;Name&gt; zum &lt;Datum&gt;</code>.
+  Die Mail enthält alle Termin-Details und (falls angegeben) die
+  E-Mail-Adresse des Anmelders.
+</p>
+<p>
+  Es wird <strong>nichts dauerhaft gespeichert</strong> — die Mail in
+  deinem Postfach ist der einzige Datensatz. Wer kommt, ergibt sich aus
+  den Mails, die du gesammelt hast. Datenschutz-freundlich, aber ohne
+  „X Leute haben sich angemeldet"-Anzeige auf der Homepage.
+</p>
+
+<h3>Wie wird Missbrauch verhindert?</h3>
+<ul>
+  <li><strong>Honeypot-Feld:</strong> Ein für Menschen unsichtbares
+      Eingabefeld; Bots füllen es gern aus, echte Nutzer nicht. Wird
+      es ausgefüllt, gibt der Server stillschweigend Erfolg zurück und
+      ignoriert die Anmeldung.</li>
+  <li><strong>Rate-Limit pro IP + Termin:</strong> Max. 1 Anmeldung
+      pro IP-Adresse pro Termin (Marker-Dateien in
+      <code>var/rsvp/</code>, 30 Tage gültig).</li>
+  <li><strong>localStorage im Browser:</strong> Wer einmal angemeldet
+      hat, sieht beim nächsten Besuch direkt die „Bist dabei!"-
+      Bestätigung (rein clientseitig — schützt nicht gegen Missbrauch,
+      ist nur UX).</li>
+  <li><strong>Eingabe-Validierung:</strong> Name 2–60 Zeichen, HTML
+      wird stripped, E-Mail über <code>FILTER_VALIDATE_EMAIL</code>.</li>
+</ul>
+
+<h3>Wenn kein Termin gepflegt ist</h3>
+<p>
+  Die Termin-Karte wird auf der Homepage automatisch ausgeblendet —
+  kein leerer Platzhalter, keine „Termin folgt"-Karte. Sobald du im
+  Editor wieder einen anlegst, taucht die Karte beim nächsten
+  Seitenaufruf direkt wieder auf.
+</p>
+
+<h2 id="tools">14. Admin-Werkzeuge</h2>
+<p>
+  Drei kleine Endpoints für deinen Alltag — alle hinter Basic-Auth:
+</p>
+
+<h3><a href="/wiki.php"><code>wiki.php</code></a></h3>
+<p>
+  Diese Seite hier. Operations-Dokumentation + Live-Status-Dashboard
+  oben (Token, Sync, DB).
+</p>
+
+<h3><a href="/termin_edit.php"><code>termin_edit.php</code></a></h3>
+<p>
+  Termin-Editor (siehe <a href="#termine">Abschnitt 13</a>).
+</p>
+
+<h3><a href="/kilometer_debug.php"><code>kilometer_debug.php</code></a></h3>
+<p>
+  Manueller Strava-Sync mit ausführlicher Konsolen-Ausgabe. Holt alle
+  Aktivitäten der letzten 365 Tage und schreibt qualifizierende in die
+  DB. Nutze ich für Sync-Debugging, wenn die Homepage „komische" Zahlen
+  zeigt.
+</p>
+
+<h3><a href="/notify_test.php"><code>notify_test.php</code></a></h3>
+<p>
+  Verifiziert, dass der Mail-Versand funktioniert. Bei jedem Aufruf
+  schickt es eine Test-Mail an die in <code>secrets.php</code>
+  konfigurierte Admin-Adresse — Throttle ist hier deaktiviert. Zeigt
+  zusätzlich die aktuelle PHP-Mail-Konfiguration des Hosters.
+  Praktisch, wenn ein Hoster-Wechsel oder Mailserver-Update den
+  Versand bricht.
+</p>
+
+<h3><a href="/strava_connect.php"><code>strava_connect.php</code></a></h3>
+<p>
+  Startet den OAuth-Flow zum (Neu-)Verknüpfen der Vereins-Strava-App
+  mit CSRF-State-Schutz. Brauchst du nach jedem Secret-Rotate oder
+  wenn die Tokens kaputt gehen
+  (siehe <a href="#einrichtung">Abschnitt 4</a>).
 </p>
 
 <p class="muted" style="margin-top:2.5rem;">

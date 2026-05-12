@@ -16,6 +16,179 @@ require __DIR__ . '/includes/header.php';
     </div>
 
     <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- Version 1.4.0 — Neue Vereinsseite & Lauftreff-Termine -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div class="changelog-entry" id="v1-4-0">
+        <div class="changelog-header">
+            <div class="changelog-meta">
+                <span class="changelog-version">v1.4.0</span>
+                <span class="changelog-date">10. Mai 2026</span>
+            </div>
+            <div class="changelog-badges">
+                <span class="badge badge-blue">Feature</span>
+            </div>
+        </div>
+
+        <h2 class="changelog-title">Neue öffentliche Vereinsseite &amp; Lauftreff-Termin-Anmeldung</h2>
+        <p class="changelog-summary">
+            Die öffentliche Vereinsseite hat ein komplett neues, mobile-first Design
+            bekommen — mit einem Live-Kilometer-Counter als Star der Startseite und
+            einer Termin-Karte, über die Besucher sich für den nächsten Lauftreff
+            anmelden können („Ich komme vorbei"). Für Admins gibt es einen
+            schlanken Termin-Editor zur Pflege mehrerer Termine im Voraus.
+            Funktionalität im Mitgliederbereich bleibt unverändert.
+        </p>
+
+        <div class="changelog-fixes">
+
+            <div class="changelog-fix">
+                <div class="changelog-fix-header">
+                    <span class="badge badge-blue">Feature</span>
+                    <strong>Vereinsseite komplett neu gestaltet</strong>
+                </div>
+                <p>
+                    Die öffentliche Vereinsseite (Startseite, Chart, Aktivitäten,
+                    Galerie) hat ein einheitliches mobile-first Design bekommen:
+                    Top-Bar mit Vereinsbrand und prominenten Mitgliederbereich-Button,
+                    Card-basiertes Layout, responsive Tabellen (auf Mobile als Karten
+                    pro Zeile), responsive Galerie-Grid. Vereinsfarben Blau und Rot
+                    als CSS-Design-Tokens — eine Stelle ändern wirkt überall.
+                </p>
+                <div class="changelog-files">
+                    <span>Neu:</span>
+                    <code>../assets/css/lauftreff-base.css</code>
+                    <code>../assets/css/public.css</code>
+                    <span style="margin-left:8px;">Geändert:</span>
+                    <code>../index.html</code>
+                    <code>../chart.html</code>
+                    <code>../aktivitäten.html</code>
+                    <code>../galerie.html</code>
+                    <code>../aktivitaeten.php</code>
+                </div>
+            </div>
+
+            <div class="changelog-fix">
+                <div class="changelog-fix-header">
+                    <span class="badge badge-blue">Feature</span>
+                    <strong>Live-Kilometer-Counter als Star der Startseite</strong>
+                </div>
+                <p>
+                    Die Vereins-Kilometer (aus dem öffentlichen Strava-Konto) werden
+                    jetzt prominent auf der Startseite angezeigt — als große Zahl in
+                    Vereinsblau mit Count-up-Animation beim Laden. Wenn Strava mal
+                    nicht erreichbar ist und auch kein Cache vorliegt, wird der Block
+                    sauber ausgeblendet — der Rest der Seite bleibt intakt.
+                </p>
+                <div class="changelog-files">
+                    <span>Geändert:</span>
+                    <code>../index.html</code>
+                </div>
+            </div>
+
+            <div class="changelog-fix">
+                <div class="changelog-fix-header">
+                    <span class="badge badge-blue">Feature</span>
+                    <strong>Lauftreff-Termin mit „Ich komme vorbei"-Anmeldung</strong>
+                </div>
+                <p>
+                    Auf der Startseite erscheint zwischen dem Kilometer-Counter und
+                    den Haupt-CTAs eine Karte mit dem nächsten geplanten Lauftreff —
+                    Datum, Titel, Treffpunkt, Beschreibung. Besucher (auch Nicht-
+                    Mitglieder) können sich per Klick anmelden. Pro Anmeldung
+                    erhält der Admin eine kurze E-Mail mit Name + Termin-Details.
+                    Anti-Spam: Honeypot-Feld, IP-basiertes Rate-Limit und Eingabe-
+                    Validierung.
+                </p>
+                <div class="changelog-files">
+                    <span>Neu:</span>
+                    <code>../naechster_lauf.json</code>
+                    <code>../naechster_lauf.php</code>
+                    <code>../rsvp.php</code>
+                </div>
+            </div>
+
+            <div class="changelog-fix">
+                <div class="changelog-fix-header">
+                    <span class="badge badge-blue">Feature</span>
+                    <strong>Termin-Editor für mehrere Termine im Voraus</strong>
+                </div>
+                <p>
+                    Admins können beliebig viele Lauftreff-Termine im Voraus pflegen
+                    (z. B. den ganzen Monat). Auf der Homepage wird immer nur der
+                    zeitlich nächste angezeigt — wenn der vorbei ist, rückt 1h nach
+                    Beginn automatisch der nächste in der Liste nach. Der Editor
+                    zeigt die ganze Liste mit Bearbeiten- und Löschen-Buttons.
+                    Speicherung in einer einfachen JSON-Datei, ohne DB.
+                </p>
+                <div class="changelog-files">
+                    <span>Neu:</span>
+                    <code>../termin_edit.php</code>
+                    <code>../includes/termine.php</code>
+                </div>
+            </div>
+
+            <div class="changelog-fix">
+                <div class="changelog-fix-header">
+                    <span class="badge badge-blue">Feature</span>
+                    <strong>View-Switch zwischen Tabelle und Grafik</strong>
+                </div>
+                <p>
+                    Auf der Aktivitäten-Seite gibt's jetzt einen kleinen Link
+                    „↗ Als Grafik anzeigen" und umgekehrt auf der Chart-Seite einen
+                    „↗ Als Tabelle anzeigen". Damit bleiben beide Ansichten gut
+                    erreichbar, ohne dass die Startseite mit doppelten Buttons
+                    überladen wird.
+                </p>
+                <div class="changelog-files">
+                    <span>Geändert:</span>
+                    <code>../chart.html</code>
+                    <code>../aktivitäten.html</code>
+                </div>
+            </div>
+
+            <div class="changelog-fix">
+                <div class="changelog-fix-header">
+                    <span class="badge badge-blue">Feature</span>
+                    <strong>Direkter Einstieg unter <code>/training/</code></strong>
+                </div>
+                <p>
+                    Vorher führte der Aufruf von <code>/training/</code> zu einem
+                    „You don't have permission"-Fehler, weil kein Default-
+                    Indexdokument existierte. Jetzt leitet ein kleiner
+                    <code>index.php</code>-Stub direkt auf das Dashboard weiter —
+                    eingeloggte Mitglieder landen sofort dort, nicht-eingeloggte
+                    werden zur Login-Seite umgeleitet. Damit funktioniert auch der
+                    „Mitgliederbereich"-Button auf der neuen Vereins-Startseite.
+                </p>
+                <div class="changelog-files">
+                    <span>Neu:</span>
+                    <code>index.php</code>
+                </div>
+            </div>
+
+            <div class="changelog-fix">
+                <div class="changelog-fix-header">
+                    <span class="badge badge-blue">Tool</span>
+                    <strong>Mail-Versand-Tester für Admins</strong>
+                </div>
+                <p>
+                    Neuer geschützter Endpoint <code>notify_test.php</code> im
+                    öffentlichen Bereich, der bei jedem Aufruf eine Test-Mail an
+                    die Admin-Adresse schickt und die aktuelle PHP-Mail-Konfiguration
+                    des Hosters anzeigt. Hilfreich, wenn nach einem Hoster-Update
+                    oder Konfigurations-Wechsel die automatischen Fehler-
+                    Benachrichtigungen nicht mehr ankommen.
+                </p>
+                <div class="changelog-files">
+                    <span>Neu:</span>
+                    <code>../notify_test.php</code>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
     <!-- Version 1.3.0 — Backend-Konsolidierung & Reliability  -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div class="changelog-entry" id="v1-3-0">
