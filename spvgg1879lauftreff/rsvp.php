@@ -64,7 +64,9 @@ $rsvpDir = __DIR__ . '/var/rsvp';
 if (!is_dir($rsvpDir)) {
     @mkdir($rsvpDir, 0755, true);
 }
-$ipHash = substr(md5(($_SERVER['REMOTE_ADDR'] ?? '0.0.0.0') . '|salt-rsvp'), 0, 16);
+$secrets  = require __DIR__ . '/secrets.php';
+$salt     = ($secrets['rsvp_salt'] ?? '') ?: 'salt-rsvp';
+$ipHash   = substr(md5(($_SERVER['REMOTE_ADDR'] ?? '0.0.0.0') . '|' . $salt), 0, 16);
 $marker = $rsvpDir . "/{$termin['id']}_{$ipHash}";
 if (file_exists($marker) && (time() - filemtime($marker)) < 60 * 60 * 24 * 30) {
     http_response_code(429);

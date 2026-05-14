@@ -1,0 +1,18 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Sensibles
+secrets.php
+.env
+
+# Automatisch erzeugte Dateien (Tokens, Cache, Marker)
+strava_tokens.json
+strava_tokens.json.bak
+strava_km_cache.json
+naechster_lauf.json
+var/
+
+# Logs / Temp
+*.log
+php_errorlog
