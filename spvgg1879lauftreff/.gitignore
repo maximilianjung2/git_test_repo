@@ -13,6 +13,10 @@ strava_km_cache.json
 naechster_lauf.json
 var/
 
+# Hochgeladene Bilder (nicht ins Repo)
+Images/Galerie/
+Images/galerie/
+
 # Logs / Temp
 *.log
 php_errorlog
