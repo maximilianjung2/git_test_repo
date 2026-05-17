@@ -344,7 +344,7 @@
     color: var(--text);
 }
 
-/* === CTA-Row (zwei Hauptaktionen) === */
+/* === CTA-Row (Hauptaktionen) === */
 .cta-row {
     display: grid;
     grid-template-columns: 1fr;
@@ -353,7 +353,10 @@
     margin: 0 auto;
 }
 @media (min-width: 480px) {
-    .cta-row { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+    .cta-row { grid-template-columns: 1fr 1fr; }
+}
+@media (min-width: 720px) {
+    .cta-row { grid-template-columns: 1fr 1fr 1fr; }
 }
 
 /* === Link-Grid (Buttons auf der Startseite, falls noch genutzt) === */
