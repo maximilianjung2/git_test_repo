@@ -73,151 +73,155 @@ $gesamtKm     = 0.0;
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#1e3a8a" />
 <title>Rundenübersicht – Haaschter Runden 2026</title>
+<link rel="stylesheet" href="/assets/css/lauftreff-base.css">
+<link rel="stylesheet" href="/assets/css/public.css">
 <style>
-    * { box-sizing: border-box; }
-    body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background-color: #f0f2f5;
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        padding: 20px;
-        min-height: 100vh;
-    }
-    .container {
-        background: #fff;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        max-width: 1000px;
-        width: 100%;
+    .tracker-page { padding-top: var(--space-5); }
+    .tracker-page h1 {
         text-align: center;
+        margin-bottom: var(--space-5);
     }
-    .logo {
-        max-width: 80px;
-        height: auto;
-        margin-bottom: 10px;
-    }
-    h1 {
-        color: #191fcb;
-        font-size: clamp(1.4rem, 4vw, 2rem);
-        margin-bottom: 10px;
-    }
-    .table-wrapper {
-        overflow-x: auto;
-        margin-top: 15px;
-    }
-    table {
+    .tracker-table {
         width: 100%;
         border-collapse: collapse;
-        min-width: 500px;
+        margin-top: var(--space-4);
     }
-    th, td {
-        border-bottom: 1px solid #ddd;
-        padding: 10px 8px;
+    .tracker-table th,
+    .tracker-table td {
         text-align: center;
+        padding: var(--space-3);
+        border-bottom: 1px solid var(--border);
     }
-    th {
-        background-color: #191fcb;
-        color: white;
-        font-size: 0.9rem;
+    .tracker-table th {
+        background: var(--blue-dark);
+        color: #fff;
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
     }
-    td { font-size: 0.95rem; }
-    .button {
-        padding: 8px 14px;
-        font-size: 1rem;
+    .tracker-table td {
+        font-size: 0.95rem;
+    }
+    .tracker-table tbody tr:hover {
+        background: var(--border-soft);
+    }
+    .tracker-table .km {
+        font-weight: 600;
+        color: var(--blue);
+    }
+    .tracker-table .runden {
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+    .btn-round {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
         border: none;
-        border-radius: 5px;
+        border-radius: var(--radius-sm);
+        font-size: 1.2rem;
+        font-weight: 700;
         cursor: pointer;
-        margin: 2px;
-        user-select: none;
+        transition: transform 0.1s ease;
+        color: #fff;
     }
-    .plus {
-        background-color: #28a745;
-        color: white;
+    .btn-round:hover { transform: scale(1.08); }
+    .btn-round.plus { background: #16a34a; }
+    .btn-round.minus { background: var(--red); }
+    .tracker-sum {
+        background: var(--border-soft);
+        font-weight: 700;
     }
-    .minus {
-        background-color: #dc3545;
-        color: white;
+    .empty-state {
+        text-align: center;
+        color: var(--muted);
+        padding: var(--space-6) 0;
     }
-    .summe {
-        font-weight: bold;
-        background-color: #eee;
-    }
-    .back-link {
-        display: inline-block;
-        margin-top: 20px;
-        color: #191fcb;
-        text-decoration: none;
-        font-size: 0.9rem;
-    }
-    .back-link:hover { text-decoration: underline; }
-
     @media (max-width: 600px) {
-        .button { padding: 10px 16px; font-size: 1.1rem; }
-        th, td { padding: 8px 4px; font-size: 0.85rem; }
-        .logo { max-width: 60px; }
+        .tracker-table th,
+        .tracker-table td { padding: var(--space-2) var(--space-1); font-size: 0.88rem; }
+        .btn-round { width: 32px; height: 32px; font-size: 1rem; }
     }
 </style>
 </head>
 <body>
-<div class="container">
-    <img src="/Images/spvgg_logo.png" alt="Logo" class="logo" />
-    <h1>Rundenübersicht – Haaschter Runden 2026</h1>
 
-    <div class="table-wrapper">
-        <table>
-            <thead>
-                <tr>
-                    <th>Vorname</th>
-                    <th>Name</th>
-                    <th>Runden</th>
-                    <th>km</th>
-                    <th>Aktion</th>
-                </tr>
-            </thead>
-            <tbody>
-            <?php if (count($teilnehmer) > 0): ?>
-                <?php foreach ($teilnehmer as $row):
-                    $gesamtRunden += $row['runden'];
-                    $gesamtKm     += $row['km'];
-                ?>
-                    <tr>
-                        <td><?= htmlspecialchars($row['Vorname']) ?></td>
-                        <td><?= htmlspecialchars($row['Name']) ?></td>
-                        <td><?= $row['runden'] ?></td>
-                        <td><?= number_format($row['km'], 2, ',', '.') ?></td>
-                        <td>
-                            <form method="post" style="display:inline;">
-                                <input type="hidden" name="id" value="<?= (int)$row['id'] ?>" />
-                                <input type="hidden" name="action" value="plus" />
-                                <button type="submit" class="button plus" aria-label="Runde erhöhen">+</button>
-                            </form>
-                            <form method="post" style="display:inline;">
-                                <input type="hidden" name="id" value="<?= (int)$row['id'] ?>" />
-                                <input type="hidden" name="action" value="minus" />
-                                <button type="submit" class="button minus" aria-label="Runde verringern">−</button>
-                            </form>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-                <tr class="summe">
-                    <td colspan="2">Gesamt</td>
-                    <td><?= $gesamtRunden ?></td>
-                    <td><?= number_format($gesamtKm, 2, ',', '.') ?></td>
-                    <td></td>
-                </tr>
-            <?php else: ?>
-                <tr><td colspan="5">Noch keine Teilnehmer angemeldet.</td></tr>
-            <?php endif; ?>
-            </tbody>
-        </table>
+<header class="public-topbar">
+    <div class="public-topbar-inner">
+        <a href="/" class="public-brand">Spvgg. Hainstadt Lauftreff</a>
+        <a href="index.html" class="btn btn-ghost btn-sm">← Zurück</a>
     </div>
+</header>
 
-    <a href="index.html" class="back-link">← Zurück zur Übersicht</a>
-</div>
+<main class="public-page">
+    <div class="container">
+        <div class="tracker-page">
+            <h1>Rundenübersicht – Haaschter Runden 2026</h1>
+
+            <?php if (count($teilnehmer) > 0): ?>
+            <div style="overflow-x: auto;">
+                <table class="tracker-table">
+                    <thead>
+                        <tr>
+                            <th>Vorname</th>
+                            <th>Name</th>
+                            <th>Runden</th>
+                            <th>km</th>
+                            <th>Aktion</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($teilnehmer as $row):
+                            $gesamtRunden += $row['runden'];
+                            $gesamtKm     += $row['km'];
+                        ?>
+                        <tr>
+                            <td><?= htmlspecialchars($row['Vorname']) ?></td>
+                            <td><?= htmlspecialchars($row['Name']) ?></td>
+                            <td class="runden"><?= $row['runden'] ?></td>
+                            <td class="km"><?= number_format($row['km'], 2, ',', '.') ?></td>
+                            <td>
+                                <form method="post" style="display:inline;">
+                                    <input type="hidden" name="id" value="<?= (int)$row['id'] ?>" />
+                                    <input type="hidden" name="action" value="plus" />
+                                    <button type="submit" class="btn-round plus" aria-label="Runde erhöhen">+</button>
+                                </form>
+                                <form method="post" style="display:inline;">
+                                    <input type="hidden" name="id" value="<?= (int)$row['id'] ?>" />
+                                    <input type="hidden" name="action" value="minus" />
+                                    <button type="submit" class="btn-round minus" aria-label="Runde verringern">−</button>
+                                </form>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                        <tr class="tracker-sum">
+                            <td colspan="2">Gesamt</td>
+                            <td><?= $gesamtRunden ?></td>
+                            <td><?= number_format($gesamtKm, 2, ',', '.') ?></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <?php else: ?>
+                <div class="empty-state">
+                    <p>Noch keine Teilnehmer angemeldet.</p>
+                    <a href="anmeldung.html" class="btn btn-primary" style="margin-top: var(--space-4);">Jetzt anmelden →</a>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+</main>
+
+<footer class="public-footer">
+    <p>&copy; Spvgg. 1879 Hainstadt — Lauftreff</p>
+</footer>
+
 </body>
 </html>
 <?php
