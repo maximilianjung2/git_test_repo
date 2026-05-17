@@ -349,11 +349,11 @@
     display: grid;
     grid-template-columns: 1fr;
     gap: var(--space-3);
-    max-width: 480px;
+    max-width: 720px;
     margin: 0 auto;
 }
 @media (min-width: 480px) {
-    .cta-row { grid-template-columns: 1fr 1fr; }
+    .cta-row { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
 }
 
 /* === Link-Grid (Buttons auf der Startseite, falls noch genutzt) === */
