@@ -146,14 +146,30 @@
     .km-counter { font-size: 6.5rem; }
 }
 
+/* === Termin-Zeile (eine oder zwei Karten nebeneinander) === */
+.termine-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    justify-content: center;
+    margin-bottom: var(--space-6);
+}
+.termine-row--single .termin-card {
+    max-width: 540px;
+    flex: 0 1 540px;
+}
+.termine-row:not(.termine-row--single) .termin-card {
+    flex: 1 1 300px;
+    max-width: 540px;
+}
+
 /* === Termin-Karte (nächster Lauftreff) === */
 .termin-card {
     background: var(--card);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
     padding: var(--space-5);
-    margin: 0 auto var(--space-6);
-    max-width: 540px;
+    margin: 0;
     border-top: 4px solid var(--blue);
 }
 .termin-overline {

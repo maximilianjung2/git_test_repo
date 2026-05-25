@@ -1,24 +1,41 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+/**
+ * Teilnehmerliste für den Faschingslauf / Neujahrslauf 2026.
+ *
+ * Liest aus haaschterrunden2025_teilnehmer alle Einträge mit
+ * Veranstaltung='Faschingslauf2026'. Credentials kommen aus
+ * ../secrets.php — keine hardcoded DB-Zugänge mehr.
+ */
 
-// DB-Verbindung
-$servername = "database-5018019376.webspace-host.com";
-$username   = "dbu302398";
-$password   = "lauftreffhomepage";
-$dbname     = "dbs14323265";
+$secrets = require __DIR__ . '/../secrets.php';
+$db      = $secrets['db'] ?? null;
 
-$conn = new mysqli($servername, $username, $password, $dbname);
-if ($conn->connect_error) {
-    die("Verbindung fehlgeschlagen: " . $conn->connect_error);
+if (!$db) {
+    die('[DB-Config fehlt in secrets.php]');
 }
 
-// Teilnehmer laden – ACHTUNG: Veranstaltung richtig schreiben
-$sql = "SELECT id, Vorname, Name, Typ, Distanz 
-        FROM haaschterrunden2025_teilnehmer 
-        WHERE Veranstaltung='Faschingslauf2026'";
+$conn = new mysqli(
+    $db['host'],
+    $db['user'],
+    $db['pass'],
+    $db['name']
+);
 
-$result = $conn->query($sql);
+if ($conn->connect_error) {
+    die('Verbindung fehlgeschlagen: ' . $conn->connect_error);
+}
+
+$conn->set_charset($db['charset'] ?? 'utf8mb4');
+
+$stmt = $conn->prepare(
+    'SELECT id, Vorname, Name, Typ, Distanz
+     FROM haaschterrunden2025_teilnehmer
+     WHERE Veranstaltung = ?'
+);
+$veranstaltung = 'Faschingslauf2026';
+$stmt->bind_param('s', $veranstaltung);
+$stmt->execute();
+$result = $stmt->get_result();
 
 $teilnehmer = [];
 if ($result && $result->num_rows > 0) {
@@ -26,6 +43,7 @@ if ($result && $result->num_rows > 0) {
         $teilnehmer[] = $row;
     }
 }
+$stmt->close();
 ?>
 <!DOCTYPE html>
 <html lang="de">
@@ -104,14 +122,13 @@ if ($result && $result->num_rows > 0) {
             </thead>
             <tbody>
             <?php if (count($teilnehmer) > 0): ?>
-                <?php foreach ($teilnehmer as $row): 
-                    // Typ lesbar machen
+                <?php foreach ($teilnehmer as $row):
                     if ($row['Typ'] == 1) {
-                        $disziplin = "Laufen";
+                        $disziplin = 'Laufen';
                     } elseif ($row['Typ'] == 2) {
-                        $disziplin = "Walken";
+                        $disziplin = 'Walken';
                     } else {
-                        $disziplin = "";
+                        $disziplin = '';
                     }
                 ?>
                     <tr>

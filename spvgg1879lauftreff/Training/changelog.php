@@ -16,6 +16,238 @@ require __DIR__ . '/includes/header.php';
     </div>
 
     <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- Version 1.6.0 — Termin-Kategorien & zwei Karten       -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div class="changelog-entry" id="v1-6-0">
+        <div class="changelog-header">
+            <div class="changelog-meta">
+                <span class="changelog-version">v1.6.0</span>
+                <span class="changelog-date">25. Mai 2026</span>
+            </div>
+            <div class="changelog-badges">
+                <span class="badge badge-blue">Feature</span>
+            </div>
+        </div>
+
+        <h2 class="changelog-title">Termin-Kategorien &amp; zwei Karten auf der Homepage</h2>
+        <p class="changelog-summary">
+            Lauftreff-Termine haben jetzt eine Kategorie: „Laufen / Joggen" oder
+            „Power Walking". Die Homepage zeigt für jede Kategorie die nächste
+            anstehende Karte — bei zwei aktiven Terminen nebeneinander, bei nur
+            einem zentriert. Der „Termine verwalten"-Link ist auf der Startseite
+            nun nur noch für eingeloggte Admins sichtbar.
+        </p>
+
+        <div class="changelog-fixes">
+
+            <div class="changelog-fix">
+                <div class="changelog-fix-header">
+                    <span class="badge badge-blue">Feature</span>
+                    <strong>Kategorien für Lauftreff-Termine</strong>
+                </div>
+                <p>
+                    Jeder Termin im Editor erhält jetzt ein Pflichtfeld „Kategorie":
+                    🏃 Laufen / Joggen oder 🚶 Power Walking. In der Terminliste wird
+                    die Kategorie als farbiges Badge angezeigt (blau / grün).
+                    Bestehende Termine ohne Kategorie-Feld werden automatisch als
+                    „Laufen" eingestuft (rückwärtskompatible Migration).
+                </p>
+                <div class="changelog-files">
+                    <span>Geändert:</span>
+                    <code>../termin_edit.php</code>
+                    <code>../includes/termine.php</code>
+                </div>
+            </div>
+
+            <div class="changelog-fix">
+                <div class="changelog-fix-header">
+                    <span class="badge badge-blue">Feature</span>
+                    <strong>Bis zu zwei Termin-Karten nebeneinander auf der Homepage</strong>
+                </div>
+                <p>
+                    <code>naechster_lauf.php</code> liefert jetzt je den nächsten Termin
+                    pro Kategorie. Die Homepage zeigt beide Karten nebeneinander, wenn
+                    für beide Kategorien ein Termin ansteht — oder nur eine zentrierte
+                    Karte, wenn nur eine Kategorie aktiv ist. Jede Karte hat ihr eigenes
+                    RSVP-Formular.
+                </p>
+                <div class="changelog-files">
+                    <span>Geändert:</span>
+                    <code>../naechster_lauf.php</code>
+                    <code>../index.php</code>
+                    <code>../assets/css/public.css</code>
+                </div>
+            </div>
+
+            <div class="changelog-fix">
+                <div class="changelog-fix-header">
+                    <span class="badge badge-blue">Feature</span>
+                    <strong>Homepage zu index.php konvertiert — Admin-Link nur für Admins</strong>
+                </div>
+                <p>
+                    Die Startseite wurde von <code>index.html</code> zu <code>index.php</code>
+                    konvertiert. Dadurch kann serverseitig die Session des Mitgliederbereichs
+                    geprüft werden: der „Termine verwalten"-Link in der Topbar erscheint nur
+                    noch, wenn der Besucher als Admin eingeloggt ist. <code>index.html</code>
+                    leitet per JavaScript-Redirect auf <code>index.php</code> weiter.
+                </p>
+                <div class="changelog-files">
+                    <span>Neu:</span>
+                    <code>../index.php</code>
+                    <span style="margin-left:8px;">Geändert:</span>
+                    <code>../index.html</code>
+                </div>
+            </div>
+
+            <div class="changelog-fix">
+                <div class="changelog-fix-header">
+                    <span class="badge badge-blue">Feature</span>
+                    <strong>„Neuer Lauf"-Link im Admin-Bereich</strong>
+                </div>
+                <p>
+                    In der Nutzerverwaltung und der Invite-Verwaltung des Mitgliederbereichs
+                    gibt es jetzt einen direkten „Neuer Lauf"-Button, der zum Trainings-
+                    Eintrags-Formular führt.
+                </p>
+                <div class="changelog-files">
+                    <span>Geändert:</span>
+                    <code>admin_users.php</code>
+                    <code>admin_invites.php</code>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- Version 1.5.0 — Security Hardening & Event-Page-Fix    -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div class="changelog-entry" id="v1-5-0">
+        <div class="changelog-header">
+            <div class="changelog-meta">
+                <span class="changelog-version">v1.5.0</span>
+                <span class="changelog-date">20. Mai 2026</span>
+            </div>
+            <div class="changelog-badges">
+                <span class="badge badge-red">Security</span>
+                <span class="badge badge-blue">Bugfix</span>
+            </div>
+        </div>
+
+        <h2 class="changelog-title">Security Hardening &amp; Layout-Fix öffentliche Eventseite</h2>
+        <p class="changelog-summary">
+            Im Rahmen eines erneuten Code-Reviews wurden drei kritische Sicherheits-
+            probleme im öffentlichen Bereich identifiziert und behoben: Klartext-DB-
+            Credentials in Alt-Event-Skripten, eine ungeschützte <code>.env</code>-Datei
+            und ein dormantes Setup-Skript mit hardcoded Admin-Passwort. Zusätzlich
+            wurde ein Layout-Bug auf der Event-Landingpage „Haaschter Runden 2026"
+            behoben, der bei längeren Detail-Items die Listen-Spalten zerhackt hat.
+        </p>
+
+        <div class="changelog-fixes">
+
+            <div class="changelog-fix">
+                <div class="changelog-fix-header">
+                    <span class="badge badge-red">Kritisch</span>
+                    <strong>Hardcoded DB-Credentials &amp; SQL-Injection in Alt-Event-Skripten</strong>
+                </div>
+                <p>
+                    In drei älteren Event-Skripten standen Datenbank-Host, -User und
+                    -Passwort als Klartext direkt im Quellcode. Bei einer der Dateien
+                    wurde zusätzlich ein POST-Parameter ohne Escaping in die SQL-Query
+                    konkateniert (klassische SQL-Injection). Alle drei laden jetzt
+                    Credentials über die zentrale <code>secrets.php</code>, verwenden
+                    Prepared Statements und validieren Eingaben gegen eine Whitelist.
+                </p>
+                <div class="changelog-files">
+                    <span>Geändert:</span>
+                    <code>../Faschingslauf2026/anmeldung.php</code>
+                    <code>../Faschingslauf2026/runden.php</code>
+                    <code>../Archiv/HaaschterRunden25/update_runden.php</code>
+                </div>
+            </div>
+
+            <div class="changelog-fix">
+                <div class="changelog-fix-header">
+                    <span class="badge badge-red">Kritisch</span>
+                    <strong><code>.env</code>-Dateien vor direktem Webzugriff geschützt</strong>
+                </div>
+                <p>
+                    Die <code>.htaccess</code> im Web-Root blockte zwar
+                    <code>secrets.php</code>, <code>strava_tokens.json</code> und
+                    <code>.htpasswd</code> — aber nicht <code>.env</code>. Bei
+                    Standard-Apache-Konfiguration hätte ein Aufruf von
+                    <code>/training/.env</code> die Klartext-Credentials als
+                    <code>text/plain</code> ausgeliefert. Außerdem fehlte in
+                    <code>/training/</code> bisher überhaupt eine eigene
+                    <code>.htaccess</code>. Beides nachgezogen — <code>.env*</code>
+                    wird jetzt überall geblockt.
+                </p>
+                <div class="changelog-files">
+                    <span>Neu:</span>
+                    <code>.htaccess</code>
+                    <span style="margin-left:8px;">Geändert:</span>
+                    <code>../.htaccess</code>
+                </div>
+            </div>
+
+            <div class="changelog-fix">
+                <div class="changelog-fix-header">
+                    <span class="badge badge-red">Kritisch</span>
+                    <strong>Altpfade mit Sicherheitsrisiken vollständig entfernt</strong>
+                </div>
+                <p>
+                    Drei alte Hilfs- bzw. Debug-Skripte wurden komplett gelöscht:
+                </p>
+                <ul>
+                    <li><code>create_user.php</code> — Setup-Skript, das einen User mit hardcoded Username/Passwort anlegte.</li>
+                    <li><code>strava_import_debug.php</code> — Debug-Endpoint, der Strava-Access-/Refresh-Tokens via <code>var_dump</code> ausgab.</li>
+                    <li><code>create_invite.php</code> — Duplikat von <code>admin_invites.php</code> ohne <code>requireAdmin()</code> und ohne CSRF-Schutz.</li>
+                </ul>
+                <p>
+                    Neue Nutzer werden ausschließlich über den Invite-Flow angelegt
+                    (<code>admin_invites.php</code> → <code>register.php</code>);
+                    Strava-Debug läuft über die Health-Karten im öffentlichen Wiki
+                    und die Admin-Mails aus <code>includes/notify.php</code>.
+                </p>
+                <div class="changelog-files">
+                    <span>Entfernt:</span>
+                    <code>create_user.php</code>
+                    <code>strava_import_debug.php</code>
+                    <code>create_invite.php</code>
+                </div>
+            </div>
+
+            <div class="changelog-fix">
+                <div class="changelog-fix-header">
+                    <span class="badge badge-blue">Bugfix</span>
+                    <strong>Layout der Event-Landingpage „Haaschter Runden 2026"</strong>
+                </div>
+                <p>
+                    Die Detail-Liste auf <code>Archiv/HaaschterRunden26/index.html</code>
+                    war bei längeren Items optisch zerhackt: Wörter standen in eigenen
+                    Spalten, fette Begriffe (<code>&lt;strong&gt;</code>) und Links waren
+                    durch Lücken vom umgebenden Fließtext getrennt. Ursache war die in
+                    <code>public.css</code> definierte Flex-Layout-Regel für
+                    <code>.event-details li</code> — Flex macht aus jedem Text-Fragment
+                    und jedem Inline-Tag einen eigenen Flex-Item. Mit einem lokalen
+                    Style-Override (Hanging-Indent: Emoji absolut links positioniert,
+                    Text-Block einspaltig daneben) ist das jetzt sauber. Außerdem in
+                    derselben Datei: doppeltes Clock-Emoji bei „Letzte Runde" durch
+                    <code>🏁</code> ersetzt, Sub-Liste für Laufen-/Walken-Startzeiten
+                    visuell als Untergruppe zusammengeführt und Reihenfolge unter dem
+                    Card umgekehrt (Action-Buttons vor dem Hinweistext).
+                </p>
+                <div class="changelog-files">
+                    <span>Geändert:</span>
+                    <code>../Archiv/HaaschterRunden26/index.html</code>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
     <!-- Version 1.4.0 — Neue Vereinsseite & Lauftreff-Termine -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <div class="changelog-entry" id="v1-4-0">

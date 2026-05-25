@@ -35,6 +35,40 @@
       font-size: 0.95rem;
       margin-top: var(--space-5);
     }
+
+    /* Override des geteilten public.css: .event-details li ist dort als
+       flex-Container definiert — das macht jedes Text-Fragment und jedes
+       Inline-Tag (<strong>, <a>) zu einem eigenen Flex-Item mit Gap und
+       sorgt bei längeren Texten für zerhackte Spalten. Hier stattdessen
+       klassischer Hanging-Indent: Emoji absolut positioniert, Text-Block
+       als normales Block-Element daneben. */
+    .event-details li {
+      display: block;
+      position: relative;
+      padding: var(--space-2) 0 var(--space-2) calc(1.5em + var(--space-2));
+      gap: 0;
+    }
+    .event-details .emoji {
+      position: absolute;
+      left: 0;
+      top: var(--space-2);
+    }
+
+    /* Startzeiten-Sublist: zusammenhängend, ohne Trennlinien dazwischen.
+       Margin-Left = 0, weil das li bereits padding-left für die Emoji-Spalte hat. */
+    .event-details .sub-list {
+      list-style: none;
+      margin: var(--space-2) 0 0 0;
+      padding: 0 0 0 var(--space-3);
+    }
+    .event-details .sub-list li {
+      display: block;
+      position: static;
+      padding: 2px 0;
+      border-bottom: none;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
   </style>
 </head>
 <body>
@@ -58,10 +92,17 @@
             <div class="card" style="max-width: 640px; margin: 0 auto; text-align: left;">
                 <ul class="event-details">
                     <li><span class="emoji">📅</span><strong>Datum:</strong> Samstag, 08.08.2026</li>
-                    <li><span class="emoji">🕣</span><strong>Startzeiten:</strong></li>
-                    <li class="indent">Laufen: jede Stunde ab 8:30 Uhr</li>
-                    <li class="indent">Walken: alle 2 Stunden ab 8:30 Uhr</li>
-                    <li><span class="emoji">🕣</span><strong>Letzte Runde:</strong> 16:30 Uhr</li>
+                    <li>
+                        <span class="emoji">🕣</span>
+                        <div>
+                            <strong>Startzeiten:</strong>
+                            <ul class="sub-list">
+                                <li>Laufen: jede Stunde ab 8:30 Uhr</li>
+                                <li>Walken: alle 2 Stunden ab 8:30 Uhr</li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li><span class="emoji">🏁</span><strong>Letzte Runde:</strong> 16:30 Uhr</li>
                     <li><span class="emoji">👟</span>Wir starten immer <strong>gemeinsam</strong> am Sportplatz und laufen so viele Runden wie wir möchten!</li>
                     <li><span class="emoji">🛣️</span>Eine Runde hat <strong>6,7 km</strong> (<a href="https://www.komoot.com/de-de/tour/2376768429" target="_blank" rel="noopener">Strecke auf Komoot</a>)</li>
                     <li><span class="emoji">😰</span>Es muss nicht jede Runde gelaufen werden, <strong>Pausen</strong> sind wichtig!</li>
@@ -71,13 +112,13 @@
                 </ul>
             </div>
 
-            <p class="event-note">Wenn ihr mindestens eine Runde mitlaufen wollt, meldet euch bitte kurz mit Namen an – für bessere Planung.</p>
-
             <div class="event-actions">
                 <a class="btn btn-ghost" href="https://www.komoot.com/de-de/tour/2376768429" target="_blank" rel="noopener">Runde bei Komoot</a>
                 <a class="btn btn-primary" href="runden.php">Teilnehmerliste</a>
                 <a class="btn btn-accent" href="anmeldung.html">Anmelden →</a>
             </div>
+
+            <p class="event-note">Wenn ihr mindestens eine Runde mitlaufen wollt, meldet euch bitte kurz mit Namen an – für bessere Planung.</p>
         </section>
 
     </div>

@@ -41,6 +41,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $titel        = trim($_POST['titel']        ?? '');
         $treffpunkt   = trim($_POST['treffpunkt']   ?? '');
         $beschreibung = trim($_POST['beschreibung'] ?? '');
+        $kategorie    = in_array($_POST['kategorie'] ?? '', ['laufen', 'power_walking'])
+                            ? $_POST['kategorie']
+                            : 'laufen';
 
         // Validierung
         $errors = [];
@@ -66,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $message = implode(' · ', $errors);
             $messageType = 'err';
             // Eingaben für Re-Anzeige bewahren
-            $editTermin = compact('id', 'datum', 'uhrzeit', 'titel', 'treffpunkt', 'beschreibung');
+            $editTermin = compact('id', 'datum', 'uhrzeit', 'titel', 'treffpunkt', 'beschreibung', 'kategorie');
         } else {
             $payload = [
                 'id'           => $id !== '' ? $id : bin2hex(random_bytes(6)),
@@ -75,6 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'titel'        => $titel,
                 'treffpunkt'   => $treffpunkt,
                 'beschreibung' => $beschreibung,
+                'kategorie'    => $kategorie,
             ];
 
             // Update wenn id bereits existiert, sonst hinzufügen
@@ -110,7 +114,7 @@ if ($editTermin === null && isset($_GET['edit'])) {
 }
 
 // Formular-Defaults
-$form = $editTermin ?? ['id'=>'', 'datum'=>'', 'uhrzeit'=>'', 'titel'=>'', 'treffpunkt'=>'', 'beschreibung'=>''];
+$form = $editTermin ?? ['id'=>'', 'datum'=>'', 'uhrzeit'=>'', 'titel'=>'', 'treffpunkt'=>'', 'beschreibung'=>'', 'kategorie'=>'laufen'];
 
 function h(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8'); }
 
@@ -179,6 +183,18 @@ function termin_anzeige(array $t): string {
         @media (max-width: 480px) { .form-row { grid-template-columns: 1fr; } }
         .field-hint { font-size: 0.82rem; color: var(--muted); margin-top: 4px; }
         .form-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 18px; }
+        .badge-kat { font-size: 0.78rem; padding: 2px 8px; border-radius: 99px; font-weight: 500; }
+        .badge-kat.laufen { background: #dbeafe; color: #1e40af; }
+        .badge-kat.pw { background: #dcfce7; color: #166534; }
+        .form-field select {
+            width: 100%; padding: 10px 12px;
+            border: 1px solid var(--border); border-radius: var(--radius-sm);
+            font-family: inherit; font-size: 0.95rem;
+            background: #fff; box-sizing: border-box;
+        }
+        .form-field select:focus {
+            outline: 2px solid var(--blue); outline-offset: -1px; border-color: var(--blue);
+        }
     </style>
 </head>
 <body>
@@ -208,7 +224,14 @@ function termin_anzeige(array $t): string {
             ?>
             <div class="termin-row<?= $past ? ' past' : '' ?>">
                 <div class="meta">
-                    <div class="meta-date"><?= h(termin_anzeige($t)) ?><?= $past ? ' (vorbei)' : '' ?></div>
+                    <div class="meta-date"><?= h(termin_anzeige($t)) ?><?= $past ? ' (vorbei)' : '' ?>
+                        <?php
+                            $kat = $t['kategorie'] ?? 'laufen';
+                            echo $kat === 'power_walking'
+                                ? ' <span class="badge badge-kat pw">🚶 Power Walking</span>'
+                                : ' <span class="badge badge-kat laufen">🏃 Laufen</span>';
+                        ?>
+                    </div>
                     <div class="meta-title"><?= h($t['titel']) ?></div>
                     <?php if ($t['treffpunkt']): ?>
                         <div class="meta-treff">📍 <?= h($t['treffpunkt']) ?></div>
@@ -234,6 +257,14 @@ function termin_anzeige(array $t): string {
         <form method="POST" action="termin_edit.php">
             <input type="hidden" name="action" value="save">
             <input type="hidden" name="id" value="<?= h($form['id']) ?>">
+
+            <div class="form-field">
+                <label for="kategorie">Kategorie</label>
+                <select id="kategorie" name="kategorie">
+                    <option value="laufen"       <?= ($form['kategorie'] ?? 'laufen') === 'laufen'       ? 'selected' : '' ?>>🏃 Laufen / Joggen</option>
+                    <option value="power_walking" <?= ($form['kategorie'] ?? '') === 'power_walking' ? 'selected' : '' ?>>🚶 Power Walking</option>
+                </select>
+            </div>
 
             <div class="form-row">
                 <div class="form-field">

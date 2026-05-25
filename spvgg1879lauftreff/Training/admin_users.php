@@ -61,6 +61,7 @@ require __DIR__ . '/includes/header.php';
 
     <div class="page-actions">
         <a class="button" href="/training/admin_invites.php">Invite-Verwaltung</a>
+        <a class="button btn-secondary" href="/training/entry_form.php">Neuer Lauf</a>
     </div>
 
     <?php if (!$users): ?>

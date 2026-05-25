@@ -1,0 +1,26 @@
+# Schutz für sensible Dateien im /training/-Bereich.
+# Funktioniert mit Apache 2.2 UND 2.4.
+
+# .env-Dateien (Klartext-Credentials) niemals ausliefern.
+# Greift auch für .env.example, .env.local etc.
+<FilesMatch "^\.env">
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+</FilesMatch>
+
+# .htaccess selbst nicht ausliefern.
+<Files ".htaccess">
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+</Files>
+

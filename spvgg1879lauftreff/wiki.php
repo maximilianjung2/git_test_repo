@@ -234,6 +234,8 @@ $overallText = [
     <li><a href="#notify">12. Fehler-Benachrichtigungen per E-Mail</a></li>
     <li><a href="#termine">13. Lauftreff-Termine &amp; RSVPs</a></li>
     <li><a href="#tools">14. Admin-Werkzeuge</a></li>
+    <li><a href="#training-arch">15. Mitgliederbereich (<code>/training/</code>): Architektur</a></li>
+    <li><a href="#training-roadmap">16. Mitgliederbereich: Backlog &amp; technische Schulden</a></li>
   </ul>
 </div>
 
@@ -338,9 +340,10 @@ $overallText = [
   </tr>
   <tr>
     <td><code>naechster_lauf.php</code></td>
-    <td>JSON-Endpoint, der den zeitlich nächsten Termin aus
-        <code>naechster_lauf.json</code> zurückliefert (gefiltert auf
-        zukünftige Termine mit 1h Karenz nach Beginn).</td>
+    <td>JSON-Endpoint, der je den zeitlich nächsten Termin pro Kategorie
+        (<code>laufen</code> / <code>power_walking</code>) zurückliefert.
+        Antwort: <code>{"laufen": {...}, "power_walking": {...}}</code>.
+        Gefiltert auf zukünftige Termine mit 1h Karenz nach Beginn.</td>
   </tr>
   <tr>
     <td><code>rsvp.php</code></td>
@@ -351,14 +354,18 @@ $overallText = [
   <tr>
     <td><code>termin_edit.php</code></td>
     <td>Admin-Formular für die Pflege der Termine (Liste + Add / Edit /
-        Delete). Hinter Basic-Auth.</td>
+        Delete). Jeder Termin hat eine Kategorie: 🏃 Laufen / Joggen
+        oder 🚶 Power Walking. Hinter Basic-Auth.</td>
   </tr>
   <tr>
     <td><code>includes/termine.php</code></td>
     <td>Geteilte Helper-Library mit
-        <code>termine_laden / speichern / naechster / finden</code>.
+        <code>termine_laden / speichern / naechster / finden</code>
+        und <code>termine_naechster_pro_kategorie</code> (gibt je
+        den nächsten Termin pro Kategorie zurück).
         Macht automatische Migration vom alten Single-Object-Format
-        zur Array-Liste.</td>
+        zur Array-Liste; Termine ohne <code>kategorie</code>-Feld
+        werden automatisch als „laufen" eingestuft.</td>
   </tr>
   <tr>
     <td><code>notify_test.php</code></td>
@@ -806,24 +813,35 @@ $overallText = [
   Admin-Formular, ohne DB.
 </p>
 
+<h3>Kategorien: Laufen &amp; Power Walking</h3>
+<p>
+  Jeder Termin gehört zu einer Kategorie: <strong>🏃 Laufen / Joggen</strong>
+  oder <strong>🚶 Power Walking</strong>. Die Homepage zeigt je die nächste
+  anstehende Karte pro Kategorie — bei beiden aktiv nebeneinander, bei nur
+  einer zentriert. So sind Läufer und Walker klar getrennt, ohne dass eine
+  Gruppe die andere verdrängt.
+</p>
+
 <h3>Termin anlegen / bearbeiten</h3>
 <ol>
   <li><a href="/termin_edit.php">termin_edit.php</a> aufrufen
-      (Basic-Auth-Login).</li>
+      (Basic-Auth-Login). Als Admin ist der Link „Termine verwalten"
+      auch direkt in der Topbar der Startseite sichtbar.</li>
   <li>Oben siehst du alle bereits gepflegten Termine, sortiert nach
-      Datum. Vergangene werden blass markiert.</li>
-  <li>„Bearbeiten" lädt einen Termin in das Formular unten; das
-      Speichern aktualisiert ihn. Ohne Vorauswahl legst du einen neuen
-      Termin an.</li>
+      Datum. Vergangene werden blass markiert, die Kategorie als
+      farbiges Badge angezeigt.</li>
+  <li>Wähle beim Anlegen / Bearbeiten die passende Kategorie aus dem
+      Dropdown. „Bearbeiten" lädt einen Termin in das Formular unten;
+      das Speichern aktualisiert ihn.</li>
   <li>„Löschen" entfernt einen Termin aus der Liste (Bestätigung
       nötig).</li>
 </ol>
 
 <div class="note">
-  <strong>Auf der Homepage wird immer nur der zeitlich nächste Termin
-  angezeigt.</strong> Du kannst aber beliebig viele im Voraus pflegen
-  (z. B. ganzen Monat). Wenn der erste vorbei ist, rückt 1h nach Beginn
-  automatisch der nächste in der Liste nach.
+  <strong>Pro Kategorie wird immer der zeitlich nächste Termin angezeigt.</strong>
+  Du kannst beliebig viele im Voraus pflegen (z. B. den ganzen Monat).
+  Wenn ein Termin vorbei ist, rückt 1h nach Beginn automatisch der nächste
+  der gleichen Kategorie nach.
 </div>
 
 <h3>Wo wird gespeichert?</h3>
@@ -921,6 +939,205 @@ $overallText = [
   wenn die Tokens kaputt gehen
   (siehe <a href="#einrichtung">Abschnitt 4</a>).
 </p>
+
+<h2 id="training-arch">15. Mitgliederbereich (<code>/training/</code>): Architektur</h2>
+<p>
+  Diese Sektion dokumentiert den Aufbau des Mitgliederbereichs unter
+  <code>/training/</code>. Bewusst hier in der Admin-Wiki und nicht in der
+  öffentlichen Member-Wiki, weil die Datei-Übersicht und Auth-Details
+  primär für Wartung gedacht sind und kein Member-Nutzwert haben.
+</p>
+
+<h3>Wichtige Dateien und Bereiche</h3>
+<ul>
+  <li><code>dashboard.php</code> – Übersichtsseite mit Kennzahlen, Verlaufsgrafik und letzten Einheiten</li>
+  <li><code>entries.php</code> – Liste der sichtbaren eigenen Einheiten inkl. Quick-Update (Desktop) und Card-View (Mobile)</li>
+  <li><code>entry_form.php</code> – neue Einheit anlegen</li>
+  <li><code>edit_entry.php</code> – vollständige Bearbeitung einer Einheit; auf Mobile priorisiert: Notizen, RPE, Fitness zuerst</li>
+  <li><code>update_quick_entry.php</code> – schnelle Änderungen direkt in der Tabelle speichern</li>
+  <li><code>delete_entry.php</code> – Eintrag löschen (POST only, CSRF-geschützt)</li>
+  <li><code>export_entries.php</code> – CSV-Export der Einheiten</li>
+  <li><code>admin_users.php</code> – Admin-Übersicht zu Nutzern, Aktivstatus, Strava-Status und Eintragsanzahl</li>
+  <li><code>admin_invites.php</code> – Admin-Oberfläche zum Erzeugen und Verwalten von Invites</li>
+  <li><code>register.php</code> – Registrierung über Invite-Link</li>
+  <li><code>login.php</code> / <code>logout.php</code> – Anmeldung und Abmeldung</li>
+  <li><code>strava_connect.php</code> – Start des OAuth-Flows zu Strava (Mitglieder-Konto)</li>
+  <li><code>strava_callback.php</code> – Verarbeitung des OAuth-Callbacks und Speichern der Tokens</li>
+  <li><code>strava_import.php</code> – Laden und Importieren aktueller Strava-Aktivitäten; Card-View auf Mobile</li>
+  <li><code>manifest.json</code> – PWA-Manifest: App-Name, Icons, Startseite, Vollbild-Modus</li>
+  <li><code>sw.js</code> – Service Worker: Asset-Caching für schnellere Ladezeiten</li>
+  <li><code>assets/icons/</code> – App-Icons (192×192 und 512×512) für PWA und Home-Bildschirm</li>
+  <li><code>assets/css/training-modern.css</code> – Haupt-Stylesheet inkl. Mobile-UX (Bottom Nav, Cards, Rating-Buttons)</li>
+  <li><code>includes/auth.php</code> – Login-Schutz, Session-Helfer, Admin-Prüfungen und CSRF-Token-Verwaltung</li>
+  <li><code>includes/db.php</code> – Datenbankverbindung</li>
+  <li><code>includes/header.php</code> / <code>includes/footer.php</code> – gemeinsames Layout, Desktop-Nav und mobile Bottom-Nav inkl. Mehr-Overlay</li>
+  <li><code>includes/entry_repository.php</code> – gemeinsame Ladefunktion für sichtbare Einheiten</li>
+  <li><code>includes/strava_client.php</code> – Laden, Refresh und API-Zugriff für Strava (Mitglieder-bezogen)</li>
+  <li><code>includes/config.php</code> – lädt zentrale <code>secrets.php</code> und Training-spezifische Werte aus <code>.env</code></li>
+</ul>
+
+<h3>Authentifizierung, Rollen und Invite-Flow</h3>
+<p>
+  Geschützte Seiten verwenden einen Session-basierten Login. In
+  <code>includes/auth.php</code> wird der Session-Name aus der Konfiguration
+  geladen; Hilfsfunktionen wie <code>requireLogin()</code>,
+  <code>currentUserId()</code>, <code>isAdmin()</code> und
+  <code>requireAdmin()</code> stehen den Skripten zur Verfügung. CSRF-Schutz
+  läuft über <code>csrfField()</code> und <code>verifyCsrf()</code>.
+</p>
+<ul>
+  <li><strong>Rollenmodell:</strong> Nutzer haben die Rolle <code>admin</code> oder <code>user</code>.</li>
+  <li><strong>Login:</strong> Anmeldung per Benutzername oder E-Mail möglich.</li>
+  <li><strong>Aktivstatus:</strong> Nur aktive Nutzer können sich anmelden.</li>
+  <li><strong>Admin-Schutz:</strong> Admin-Seiten werden serverseitig über <code>requireAdmin()</code> geschützt.</li>
+</ul>
+<p>
+  Die produktive Nutzeranlage erfolgt ausschließlich über Einladungslinks.
+  Ein Invite enthält keinen offen gespeicherten Token, sondern nur einen
+  SHA-256-Hash des Tokens in der Datenbank. Der echte Registrierungslink wird
+  nur direkt nach dem Erzeugen einmalig angezeigt.
+</p>
+<ul>
+  <li>Invites werden für eine konkrete E-Mail-Adresse erzeugt.</li>
+  <li>Ein Invite ist standardmäßig 2 Tage gültig.</li>
+  <li><code>register.php</code> akzeptiert nur ungenutzte und nicht abgelaufene Invites.</li>
+  <li>Bei erfolgreicher Registrierung wird der Invite über <code>used_at</code> als verbraucht markiert.</li>
+  <li>Neue Registrierungen erhalten standardmäßig die Rolle <code>user</code>.</li>
+</ul>
+
+<h3>Strava-Integration im Mitgliederbereich</h3>
+<p>
+  Die Strava-Anbindung ist als vollständiger OAuth-Flow umgesetzt. Nutzer
+  verbinden ihr Konto über <code>strava_connect.php</code>, anschließend
+  verarbeitet <code>strava_callback.php</code> den Rückruf, prüft den
+  OAuth-State und speichert die Verbindung.
+</p>
+<ul>
+  <li>Strava-Tokens werden nutzerbezogen in <code>strava_connections</code> gespeichert.</li>
+  <li>Vor API-Zugriffen wird ein ablaufendes Token automatisch aktualisiert.</li>
+  <li>Importiert werden Distanz, Dauer und durchschnittlicher Puls (<code>average_heartrate</code>) aus der Strava-API.</li>
+  <li>Bereits importierte Aktivitäten werden über <code>source = 'strava'</code> und <code>source_activity_id</code> erkannt.</li>
+  <li>Doppelte Imports werden still abgefangen.</li>
+</ul>
+
+<h2 id="training-roadmap">16. Mitgliederbereich: Backlog &amp; technische Schulden</h2>
+<p>
+  Sammelstelle für offene Punkte im <code>/training/</code>-Bereich.
+  Abgeschlossene Änderungen sind im
+  <a href="/training/changelog.php">Changelog</a> dokumentiert.
+</p>
+
+<h3>Interne Hinweise / technische Schulden</h3>
+<ul>
+  <li>Die Altpfade <code>create_user.php</code>, <code>create_invite.php</code> und <code>strava_import_debug.php</code> wurden in v1.5.0 vollständig entfernt. Neue Nutzer werden über den Invite-Flow (<code>admin_invites.php</code> → <code>register.php</code>) angelegt; Strava-Debug läuft über die Health-Karten oben auf dieser Seite und die Admin-Mails aus <code>includes/notify.php</code>.</li>
+  <li>Die Wiki beschreibt absichtlich keine Secrets, Passwörter oder API-Keys.</li>
+</ul>
+
+<h3>Bereits umgesetzt</h3>
+<ul>
+  <li>Einheiten erfassen und bearbeiten</li>
+  <li>direktes Quick-Update in der Einheitenübersicht</li>
+  <li>persönliche Notizen zu Einheiten</li>
+  <li>Dashboard mit Kennzahlen und Formkurve</li>
+  <li>Invite-basierte Nutzeranlage</li>
+  <li>Admin-Nutzerverwaltung</li>
+  <li>Admin-Invite-Verwaltung</li>
+  <li>Strava-Import inkl. Pulsdaten</li>
+  <li>CSV-Export der Einheiten</li>
+  <li>Modernes Frontend mit Theme-Umschalter (Modern/Classic)</li>
+  <li>Einheiten-Tabelle mit konfigurierbaren Spalten, Drag-to-resize und Breiteneinstellung</li>
+  <li>Security Patch v1.1.0 (CSRF, DELETE via POST, Open Redirect, Host-Header, .env)</li>
+  <li>Progressive Web App (PWA): installierbar auf iOS und Android, Service Worker</li>
+  <li>Mobile UX v1.2.0: Bottom Navigation, Card-Layouts, optimiertes Bearbeitungsformular, Strava-Import als Cards</li>
+  <li>Security Hardening v1.5.0: Hardcoded DB-Credentials &amp; SQL-Injection in Alt-Event-Skripten entfernt, <code>.env</code>-Dateien per <code>.htaccess</code> blockiert, <code>create_user.php</code> deaktiviert, Layout-Bug auf der Event-Landingpage Haaschter Runden 2026 gefixt</li>
+</ul>
+
+<h3>Priorität 1 — Nächste Schritte (hoher Nutzen)</h3>
+<p>Diese Punkte haben den größten direkten Mehrwert für die tägliche Nutzung.</p>
+<ul>
+  <li>
+    <strong>Notizen im Dashboard</strong> —
+    Notizen sind das Kernstück der Einheiten-Dokumentation, tauchen auf dem
+    Dashboard aber bisher nicht auf. Geplant ist ein Bereich, der die zuletzt
+    geschriebenen Notizen direkt sichtbar macht.
+  </li>
+  <li>
+    <strong>Einheiten als Highlight markieren</strong> —
+    Wichtige Läufe (Wettkämpfe, Bestleistungen, besondere Einheiten) sollen
+    mit einem Flag oder Stern markiert werden können. In der Einheitenliste
+    kann dann gezielt nach Highlights gefiltert werden.
+  </li>
+  <li>
+    <strong>Filter und Suche in „Meine Einheiten"</strong> —
+    Mit wachsender Datenmenge wird die Tabelle ohne Filter schwer zu navigieren.
+    Geplant sind mindestens ein Zeitraumfilter und ein Filter nach Einheitstyp.
+  </li>
+</ul>
+
+<h3>Priorität 2 — Nächster Patch</h3>
+<p>Sinnvolle Verbesserungen, die etwas mehr Aufwand erfordern oder noch offen diskutiert werden.</p>
+<ul>
+  <li>
+    <strong>RPE und Fitness — Eingabe überarbeiten</strong> —
+    Die aktuellen Schieberegler (Slider) funktionieren, sind aber in der
+    Darstellung unübersichtlich und in der Bedienung unnötig, da die Zahl
+    sowieso manuell eingegeben wird. Geplant ist eine schlankere Variante,
+    z. B. ein einfaches Zahlenfeld oder eine Schaltflächen-Reihe (1–10).
+  </li>
+  <li>
+    <strong>Serverseitige Eingabe-Validierung</strong> —
+    Felder wie <code>activity_date</code>, <code>sport_type</code> und
+    Wertebereiche (z. B. RPE 1–10) werden aktuell clientseitig geprüft, aber
+    nicht konsequent serverseitig validiert. Betrifft
+    <code>entry_form.php</code> und <code>edit_entry.php</code>.
+  </li>
+  <li>
+    <strong>Strava Token Retry-Logik</strong> —
+    Wenn ein Strava-Zugriffstoken während eines laufenden Imports abläuft,
+    schlägt der Request fehl. Geplant ist eine automatische Retry-Logik nach
+    erfolgreichem Token-Refresh.
+  </li>
+  <li>
+    <strong>Soft-Delete / Papierkorb</strong> —
+    Gelöschte Einheiten sind aktuell unwiderruflich weg. Ein Papierkorb oder
+    eine Ausblend-Funktion mit Wiederherstellungsoption würde versehentliche
+    Löschungen abfangen.
+  </li>
+</ul>
+
+<h3>Priorität 3 — Technische Schuld (kein Zeitdruck)</h3>
+<p>
+  Diese Punkte haben keinen direkten Nutzereinfluss, verbessern aber die
+  Wartbarkeit und Sauberkeit der Codebasis langfristig.
+</p>
+<ul>
+  <li>
+    <strong>Inline-JavaScript auslagern</strong> —
+    Das JavaScript in <code>entries.php</code> (Spalten-Toggle, Drag-Resize,
+    Breitensteuerung) sollte in eine externe Datei
+    <code>assets/js/entries.js</code> ausgelagert werden. Macht den Code
+    übersichtlicher und ermöglicht Browser-Caching.
+  </li>
+  <li>
+    <strong>GROUP BY Kompatibilität in admin_users.php</strong> —
+    Die aktuelle Abfrage könnte auf MySQL-Instanzen mit striktem
+    <code>ONLY_FULL_GROUP_BY</code>-Modus Fehler werfen. Betrifft nur den
+    Admin-Bereich und ist aktuell wahrscheinlich kein aktives Problem.
+  </li>
+  <li>
+    <strong>Session-Härtung im Login</strong> —
+    <code>Training/login.php</code> macht aktuell kein
+    <code>session_regenerate_id(true)</code> nach erfolgreichem Login —
+    Session-Fixation-Vektor. Eine Zeile beim nächsten Patch nachziehen.
+  </li>
+  <li>
+    <strong><code>hash_equals</code> in Strava-Callback</strong> —
+    <code>Training/strava_callback.php</code> vergleicht den OAuth-State mit
+    <code>!==</code> statt <code>hash_equals()</code> (Timing-Attack).
+    <code>callback.php</code> im Root macht es bereits korrekt — Pattern
+    übernehmen.
+  </li>
+</ul>
 
 <p class="muted" style="margin-top:2.5rem;">
   Stand: <?php echo date('Y-m-d'); ?> ·

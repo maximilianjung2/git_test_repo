@@ -50,6 +50,9 @@ if (!function_exists('termine_laden')) {
                 'titel'        => (string)$t['titel'],
                 'treffpunkt'   => (string)($t['treffpunkt']   ?? ''),
                 'beschreibung' => (string)($t['beschreibung'] ?? ''),
+                'kategorie'    => in_array($t['kategorie'] ?? '', ['laufen', 'power_walking'])
+                                    ? (string)$t['kategorie']
+                                    : 'laufen',
             ];
         }
         return $termine;
@@ -85,6 +88,28 @@ if (!function_exists('termine_laden')) {
         if (empty($candidates)) return null;
         usort($candidates, fn($a, $b) => $a['ts'] - $b['ts']);
         return $candidates[0]['termin'];
+    }
+
+    /**
+     * Gibt je den nächsten Termin pro Kategorie zurück.
+     * Ergebnis: ['laufen' => array|null, 'power_walking' => array|null]
+     */
+    function termine_naechster_pro_kategorie(array $termine): array
+    {
+        $now = time();
+        $result = ['laufen' => null, 'power_walking' => null];
+        $best   = ['laufen' => PHP_INT_MAX, 'power_walking' => PHP_INT_MAX];
+
+        foreach ($termine as $t) {
+            $kat = $t['kategorie'] ?? 'laufen';
+            if (!isset($result[$kat])) continue;
+            $ts = strtotime($t['datum'] . ' ' . ($t['uhrzeit'] ?: '23:59'));
+            if ($ts !== false && $ts >= $now - 3600 && $ts < $best[$kat]) {
+                $best[$kat]   = $ts;
+                $result[$kat] = $t;
+            }
+        }
+        return $result;
     }
 
     function termine_finden(array $termine, string $id): ?array

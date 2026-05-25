@@ -74,6 +74,7 @@ require __DIR__ . '/includes/header.php';
 
     <div class="page-actions">
         <a class="button btn-secondary" href="/training/admin_users.php">Nutzerverwaltung</a>
+        <a class="button btn-secondary" href="/training/entry_form.php">Neuer Lauf</a>
     </div>
 
     <h2>Neuen Invite erzeugen</h2>

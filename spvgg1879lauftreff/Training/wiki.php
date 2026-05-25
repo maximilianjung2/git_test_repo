@@ -270,8 +270,7 @@ require __DIR__ . '/includes/header.php';
 
         <h3>Interne Hinweise / technische Schulden</h3>
         <ul>
-            <li><code>create_user.php</code> wirkt wie ein manuelles Hilfs- oder Setup-Skript und sollte nicht produktiv öffentlich erreichbar sein.</li>
-            <li><code>create_invite.php</code> ist funktional teilweise durch <code>admin_invites.php</code> überholt und sollte mittelfristig entweder entfernt oder klar als Altpfad markiert werden.</li>
+            <li>Die Altpfade <code>create_user.php</code>, <code>create_invite.php</code> und <code>strava_import_debug.php</code> wurden in v1.5.0 vollständig entfernt. Neue Nutzer werden über den Invite-Flow (<code>admin_invites.php</code> → <code>register.php</code>) angelegt; Strava-Debug läuft über die Health-Karten im öffentlichen Wiki und die Admin-Mails aus <code>includes/notify.php</code>.</li>
             <li>Die Wiki beschreibt absichtlich keine Secrets, Passwörter oder API-Keys.</li>
         </ul>
 
@@ -312,6 +311,7 @@ require __DIR__ . '/includes/header.php';
             <li>Security Patch v1.1.0 (CSRF, DELETE via POST, Open Redirect, Host-Header, .env)</li>
             <li>Progressive Web App (PWA): installierbar auf iOS und Android, Service Worker</li>
             <li>Mobile UX v1.2.0: Bottom Navigation, Card-Layouts, optimiertes Bearbeitungsformular, Strava-Import als Cards</li>
+            <li>Security Hardening v1.5.0: Hardcoded DB-Credentials &amp; SQL-Injection in Alt-Event-Skripten entfernt, <code>.env</code>-Dateien per <code>.htaccess</code> blockiert, <code>create_user.php</code> deaktiviert, Layout-Bug auf der Event-Landingpage Haaschter Runden 2026 gefixt</li>
         </ul>
 
         <h3>Priorität 1 — Nächste Schritte (hoher Nutzen)</h3>
@@ -371,21 +371,10 @@ require __DIR__ . '/includes/header.php';
         </p>
         <ul>
             <li>
-                <strong>Code-Duplikation bereinigen</strong> —
-                <code>create_invite.php</code> und <code>admin_invites.php</code> enthalten identische
-                Logik zur Invite-Erstellung. Mittelfristig sollte das in eine gemeinsame Funktion
-                ausgelagert und <code>create_invite.php</code> als Altpfad entfernt werden.
-            </li>
-            <li>
                 <strong>Inline-JavaScript auslagern</strong> —
                 Das JavaScript in <code>entries.php</code> (Spalten-Toggle, Drag-Resize, Breitensteuerung)
                 sollte in eine externe Datei <code>assets/js/entries.js</code> ausgelagert werden.
                 Macht den Code übersichtlicher und ermöglicht Browser-Caching.
-            </li>
-            <li>
-                <strong>Altpfade und Hilfsskripte aufräumen</strong> —
-                Dateien wie <code>create_user.php</code> oder ältere Setup-Skripte sollten geprüft
-                und wenn nicht mehr nötig entfernt oder explizit gesichert werden.
             </li>
             <li>
                 <strong>GROUP BY Kompatibilität in admin_users.php</strong> —

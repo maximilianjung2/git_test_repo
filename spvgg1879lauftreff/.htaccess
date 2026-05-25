@@ -1,13 +1,16 @@
-# Schutz für interne Admin-Seiten der öffentlichen Welt.
-# Funktioniert mit Apache 2.2 UND 2.4.
-
-<FilesMatch "^(wiki|kilometer_debug|strava_connect|notify_test|termin_edit)\.php$">
+# Schutz für interne Admin-Seiten im Root-Level.
+# WICHTIG: nicht <FilesMatch> verwenden — das matcht den Dateinamen
+# auch in Unterordnern, wodurch Training/wiki.php und
+# Training/strava_connect.php ungewollt mitgeschützt würden
+# (die haben ihre eigene Session-basierte Auth).
+# Stattdessen <If> mit REQUEST_URI, anchored auf Root.
+<If "%{REQUEST_URI} =~ m#^/(wiki|kilometer_debug|strava_connect|notify_test|termin_edit)\.php$#">
     AuthType Basic
     AuthName "Interner Bereich - Lauftreff"
     # Pfad ggf. an Hoster anpassen (siehe Wiki, Abschnitt 9):
     AuthUserFile /home/www/spvgg1879-lauftreff/htdocs/.htpasswd
     Require valid-user
-</FilesMatch>
+</If>
 
 # Token-Dateien niemals direkt ausliefern.
 <FilesMatch "^strava_tokens\.json(\.bak)?$">
@@ -30,6 +33,18 @@
         Require all denied
     </IfModule>
 </Files>
+
+# .env-Dateien (Klartext-Credentials) niemals ausliefern.
+# Greift auch für .env.example, .env.local etc.
+<FilesMatch "^\.env">
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+</FilesMatch>
 
 # .htpasswd niemals ausliefern.
 <Files ".htpasswd">
